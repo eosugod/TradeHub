@@ -1,10 +1,10 @@
-package com.eosuGod.TradeHub.product.service;
+package com.eosugod.tradehub.product.service;
 
-import com.eosuGod.TradeHub.product.dto.request.RequestCreateProductDto;
-import com.eosuGod.TradeHub.product.dto.response.ResponseProductDto;
-import com.eosuGod.TradeHub.product.entity.Product;
-import com.eosuGod.TradeHub.product.mapper.ProductMapper;
-import com.eosuGod.TradeHub.product.repository.ProductRepository;
+import com.eosugod.tradehub.product.dto.request.RequestCreateProductDto;
+import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
+import com.eosugod.tradehub.product.entity.Product;
+import com.eosugod.tradehub.product.mapper.ProductMapper;
+import com.eosugod.tradehub.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

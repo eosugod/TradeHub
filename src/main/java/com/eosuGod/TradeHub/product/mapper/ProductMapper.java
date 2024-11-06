@@ -1,10 +1,10 @@
-package com.eosuGod.TradeHub.product.mapper;
+package com.eosugod.tradehub.product.mapper;
 
-import com.eosuGod.TradeHub.product.dto.request.RequestCreateProductDto;
-import com.eosuGod.TradeHub.product.dto.response.ResponseProductDto;
-import com.eosuGod.TradeHub.product.entity.Product;
-import com.eosuGod.TradeHub.product.vo.Address;
-import com.eosuGod.TradeHub.product.vo.Money;
+import com.eosugod.tradehub.product.dto.request.RequestCreateProductDto;
+import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
+import com.eosugod.tradehub.product.entity.Product;
+import com.eosugod.tradehub.product.vo.Address;
+import com.eosugod.tradehub.product.vo.Money;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

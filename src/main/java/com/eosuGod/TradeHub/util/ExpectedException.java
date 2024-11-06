@@ -1,4 +1,5 @@
-package com.eosuGod.TradeHub.util;
+package com.eosugod.tradehub.util;
+
 
 import lombok.Getter;
 

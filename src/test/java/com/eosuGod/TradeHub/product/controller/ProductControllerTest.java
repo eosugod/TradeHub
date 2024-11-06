@@ -1,9 +1,9 @@
-package com.eosuGod.TradeHub.product.controller;
+package com.eosugod.tradehub.product.controller;
 
-import com.eosuGod.TradeHub.product.dto.request.RequestCreateProductDto;
-import com.eosuGod.TradeHub.product.dto.response.ResponseProductDto;
-import com.eosuGod.TradeHub.product.entity.Product;
-import com.eosuGod.TradeHub.product.service.ProductService;
+import com.eosugod.tradehub.product.dto.request.RequestCreateProductDto;
+import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
+import com.eosugod.tradehub.product.entity.Product;
+import com.eosugod.tradehub.product.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.math.BigDecimal;
 
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
@@ -47,6 +49,8 @@ public class ProductControllerTest {
         requestDto.setText("This is a sample product");
         requestDto.setState(Product.SaleState.FOR_SALE);
         requestDto.setThumbNailImage("image_url");
+        requestDto.setPrice(BigDecimal.valueOf(1000));
+        requestDto.setLocationCode("1234567890");
 
         responseDto = new ResponseProductDto(
                 1L,

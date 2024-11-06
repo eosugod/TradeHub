@@ -1,6 +1,6 @@
-package com.eosuGod.TradeHub.product.dto.request;
+package com.eosugod.tradehub.product.dto.request;
 
-import com.eosuGod.TradeHub.product.entity.Product.SaleState;
+import com.eosugod.tradehub.product.entity.Product.SaleState;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

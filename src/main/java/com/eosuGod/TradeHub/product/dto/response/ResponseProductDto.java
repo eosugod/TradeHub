@@ -1,6 +1,6 @@
-package com.eosuGod.TradeHub.product.dto.response;
+package com.eosugod.tradehub.product.dto.response;
 
-import com.eosuGod.TradeHub.product.entity.Product.SaleState;
+import com.eosugod.tradehub.product.entity.Product.SaleState;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
