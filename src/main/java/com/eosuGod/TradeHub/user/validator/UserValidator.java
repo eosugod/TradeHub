@@ -1,4 +1,4 @@
-package com.eosugod.tradehub.user.Validator;
+package com.eosugod.tradehub.user.validator;
 
 import com.eosugod.tradehub.user.port.UserPort;
 import com.eosugod.tradehub.util.ExceptionCode;

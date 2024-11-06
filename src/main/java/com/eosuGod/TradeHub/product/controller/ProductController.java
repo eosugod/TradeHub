@@ -1,9 +1,9 @@
-package com.eosuGod.TradeHub.product.controller;
+package com.eosugod.tradehub.product.controller;
 
 
-import com.eosuGod.TradeHub.product.dto.request.RequestCreateProductDto;
-import com.eosuGod.TradeHub.product.dto.response.ResponseProductDto;
-import com.eosuGod.TradeHub.product.service.ProductService;
+import com.eosugod.tradehub.product.dto.request.RequestCreateProductDto;
+import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
+import com.eosugod.tradehub.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

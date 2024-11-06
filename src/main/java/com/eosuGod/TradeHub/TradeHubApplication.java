@@ -1,4 +1,4 @@
-package com.eosuGod.TradeHub;
+package com.eosugod.tradehub;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
