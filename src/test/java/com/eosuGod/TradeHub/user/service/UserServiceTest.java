@@ -3,7 +3,6 @@ package com.eosugod.tradehub.user.service;
 import com.eosugod.tradehub.user.validator.UserValidator;
 import com.eosugod.tradehub.user.domain.UserDomain;
 import com.eosugod.tradehub.user.dto.request.RequestCreateUserDto;
-import com.eosugod.tradehub.user.dto.response.ResponseUserDto;
 import com.eosugod.tradehub.user.port.UserPort;
 import com.eosugod.tradehub.user.vo.Address;
 import com.eosugod.tradehub.user.vo.Money;
@@ -54,7 +53,7 @@ class UserServiceTest {
         given(userPort.save(request)).willReturn(expect);
 
         //when
-        ResponseUserDto user = userService.createUser(request);
+        userService.createUser(request);
 
         //then
         verify(userPort, times(1)).save(any());
@@ -79,7 +78,7 @@ class UserServiceTest {
         });
 
         // 확인
-        assertEquals(exception.getCode(), 1001);
+        assertEquals(1001,exception.getCode());
     }
 
     @DisplayName("이미 등록된 닉네임이라면 회원 등록이 불가능하다.")
@@ -100,7 +99,7 @@ class UserServiceTest {
         });
 
         // 확인
-        assertEquals(exception.getCode(), 1002);
+        assertEquals(1002, exception.getCode());
     }
 
 
