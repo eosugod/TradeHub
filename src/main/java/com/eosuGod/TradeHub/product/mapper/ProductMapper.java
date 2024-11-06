@@ -5,9 +5,12 @@ import com.eosuGod.TradeHub.product.dto.response.ResponseProductDto;
 import com.eosuGod.TradeHub.product.entity.Product;
 import com.eosuGod.TradeHub.product.vo.Address;
 import com.eosuGod.TradeHub.product.vo.Money;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProductMapper {
-    static public Product toEntity(RequestCreateProductDto requestDto) {
+    public static Product toEntity(RequestCreateProductDto requestDto) {
         Product product = new Product();
         product.setSellerId(requestDto.getSellerId());
         product.setPrice(new Money(requestDto.getPrice()));
@@ -19,7 +22,7 @@ public class ProductMapper {
         return product;
     }
 
-    static public ResponseProductDto toResponseDto(Product product) {
+    public static ResponseProductDto toResponseDto(Product product) {
         return new ResponseProductDto(
                 product.getId(),
                 product.getSellerId(),
