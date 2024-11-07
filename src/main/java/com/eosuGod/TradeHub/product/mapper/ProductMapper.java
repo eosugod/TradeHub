@@ -1,6 +1,7 @@
 package com.eosugod.tradehub.product.mapper;
 
 import com.eosugod.tradehub.product.dto.request.RequestCreateProductDto;
+import com.eosugod.tradehub.product.dto.request.RequestUpdateProductDto;
 import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
 import com.eosugod.tradehub.product.entity.Product;
 import com.eosugod.tradehub.product.vo.Address;
@@ -11,29 +12,42 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProductMapper {
     public static Product toEntity(RequestCreateProductDto requestDto) {
-        Product product = new Product();
-        product.setSellerId(requestDto.getSellerId());
-        product.setPrice(new Money(requestDto.getPrice()));
-        product.setTitle(requestDto.getTitle());
-        product.setText(requestDto.getText());
-        product.setLocationCode(new Address(requestDto.getLocationCode()));
-        product.setState(Product.SaleState.FOR_SALE); // 기본 상태 판매 중 설정
-        product.setThumbNailImage(requestDto.getThumbNailImage());
-        return product;
+        return Product.builder()
+                      .sellerId(requestDto.getSellerId())
+                      .price(new Money(requestDto.getPrice()))
+                      .title(requestDto.getTitle())
+                      .text(requestDto.getText())
+                      .locationCode(new Address(requestDto.getLocationCode()))
+                      .state(Product.SaleState.FOR_SALE) // 기본 상태 판매 중 설정
+                      .thumbNailImage(requestDto.getThumbNailImage())
+                      .build();
+    }
+
+    public static Product toEntity(RequestUpdateProductDto requestDto, Product product) {
+        return Product.builder()
+                .id(product.getId())
+                .sellerId(product.getSellerId())
+                .price(new Money(requestDto.getPrice()))
+                .title(requestDto.getTitle())
+                .text(requestDto.getText())
+                .locationCode(new Address(requestDto.getLocationCode()))
+                .state(product.getState())
+                .thumbNailImage(requestDto.getThumbNailImage())
+                .build();
     }
 
     public static ResponseProductDto toResponseDto(Product product) {
-        return new ResponseProductDto(
-                product.getId(),
-                product.getSellerId(),
-                product.getBuyerId(),
-                product.getPrice().getValue(),
-                product.getTitle(),
-                product.getText(),
-                product.getLocationCode().getValue(),
-                product.getState(),
-                product.getThumbNailImage()
-        );
+        return ResponseProductDto.builder()
+                .id(product.getId())
+                .sellerId(product.getSellerId())
+                .buyerId(product.getBuyerId())
+                .price(product.getPrice().getValue())
+                .title(product.getTitle())
+                .text(product.getText())
+                .locationCode(product.getLocationCode().getValue())
+                .state(product.getState())
+                .thumbNailImage(product.getThumbNailImage())
+                .build();
     }
 }
 

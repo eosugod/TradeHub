@@ -1,9 +1,7 @@
 package com.eosugod.tradehub.product.dto.request;
 
-import com.eosugod.tradehub.product.entity.Product.SaleState;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -18,9 +16,7 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestCreateProductDto {
-    @NotNull(message = "판매자 ID는 필수 사항입니다.")
-    private Long sellerId;
+public class RequestUpdateProductDto {
     @Min(value = 1000, message = "최소 가격은 1,000원 입니다.")
     private BigDecimal price;
     @NotBlank(message = "제목을 입력해 주세요.")
@@ -29,6 +25,5 @@ public class RequestCreateProductDto {
     private String text;
     @NotBlank @Size(min=10, max=10)
     private String locationCode;
-    private SaleState state;
     private String thumbNailImage;
 }

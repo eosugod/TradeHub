@@ -2,16 +2,14 @@ package com.eosugod.tradehub.product.controller;
 
 
 import com.eosugod.tradehub.product.dto.request.RequestCreateProductDto;
+import com.eosugod.tradehub.product.dto.request.RequestUpdateProductDto;
 import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
 import com.eosugod.tradehub.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/products")
@@ -26,4 +24,11 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
+    // 상품 수정
+    @PutMapping("/{productId}")
+    public ResponseEntity<ResponseProductDto> updateProduct(@PathVariable Long productId,
+                                                            @RequestBody @Valid RequestUpdateProductDto requestDto) {
+        ResponseProductDto updatedProduct = productService.updateProduct(productId, requestDto);
+        return ResponseEntity.ok(updatedProduct);
+    }
 }
