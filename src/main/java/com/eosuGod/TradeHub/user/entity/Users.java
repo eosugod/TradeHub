@@ -3,12 +3,16 @@ package com.eosugod.tradehub.user.entity;
 import com.eosugod.tradehub.user.vo.Address;
 import com.eosugod.tradehub.user.vo.Money;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Builder
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
