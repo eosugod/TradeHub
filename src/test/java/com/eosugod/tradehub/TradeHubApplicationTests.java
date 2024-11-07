@@ -1,4 +1,4 @@
-package com.eosuGod.TradeHub;
+package com.eosugod.tradehub;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
