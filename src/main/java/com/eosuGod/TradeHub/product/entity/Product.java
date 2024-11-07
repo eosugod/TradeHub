@@ -3,12 +3,13 @@ package com.eosugod.tradehub.product.entity;
 import com.eosugod.tradehub.product.vo.Address;
 import com.eosugod.tradehub.product.vo.Money;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
+@Builder
 @Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
