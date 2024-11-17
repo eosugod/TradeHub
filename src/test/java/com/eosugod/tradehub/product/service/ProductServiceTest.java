@@ -6,6 +6,7 @@ import com.eosugod.tradehub.product.entity.Product;
 import com.eosugod.tradehub.product.mapper.ProductMapper;
 import com.eosugod.tradehub.product.repository.ProductRepository;
 import com.eosugod.tradehub.product.service.ProductService;
+import com.eosugod.tradehub.util.ExpectedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,11 +16,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
@@ -66,5 +68,29 @@ public class ProductServiceTest {
         assertEquals(product.getLocationCode().getValue(), responseDto.getLocationCode());
         assertEquals(product.getState(), responseDto.getState());
         assertEquals(product.getThumbNailImage(), responseDto.getThumbNailImage());
+    }
+
+    @Test
+    @DisplayName("상품 삭제")
+    public void testDeleteProduct() {
+        // given
+        given(productRepository.findById(product.getId())).willReturn(Optional.of(product));
+
+        // when
+        productService.deleteProduct(product.getId());
+
+        // then
+        verify(productRepository).delete(product);
+    }
+
+    @Test
+    @DisplayName("상품 삭제 실패 테스트")
+    public void testDeleteNotFound() {
+        // given
+        Long productId = 9L;
+        given(productRepository.findById(productId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThrows(ExpectedException.class, () -> productService.deleteProduct(productId));
     }
 }
