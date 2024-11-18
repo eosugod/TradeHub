@@ -4,6 +4,8 @@ import com.eosugod.tradehub.product.dto.request.RequestCreateProductDto;
 import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
 import com.eosugod.tradehub.product.entity.Product;
 import com.eosugod.tradehub.product.service.ProductService;
+import com.eosugod.tradehub.util.ExceptionCode;
+import com.eosugod.tradehub.util.ExpectedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -21,7 +24,9 @@ import java.math.BigDecimal;
 
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -87,4 +92,18 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.thumbNailImage").value(responseDto.getThumbNailImage()));
     }
 
+    @Test
+    @DisplayName("상품 삭제 요청")
+    void testDeleteProduct() throws Exception {
+        // given
+        Long productId = 1L;
+
+        // when
+        Mockito.doNothing().when(productService).deleteProduct(productId);
+
+        // then
+        mockMvc.perform(delete("/products/{id}", productId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
 }
