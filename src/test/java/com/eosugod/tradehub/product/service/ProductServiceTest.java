@@ -5,7 +5,6 @@ import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
 import com.eosugod.tradehub.product.entity.Product;
 import com.eosugod.tradehub.product.mapper.ProductMapper;
 import com.eosugod.tradehub.product.repository.ProductRepository;
-import com.eosugod.tradehub.product.service.ProductService;
 import com.eosugod.tradehub.util.ExpectedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +23,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class ProductServiceTest {
+class ProductServiceTest {
     @Mock
     private ProductRepository productRepository;
     @InjectMocks
@@ -51,7 +50,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("상품 등록")
-    public void testCreateProduct() {
+    void testCreateProduct() {
         // given
         given(productRepository.save(any(Product.class))).willReturn(product);
 
@@ -71,8 +70,8 @@ public class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("상품 삭제")
-    public void testDeleteProduct() {
+    @DisplayName("상품 삭제 성공")
+    void testDeleteProduct() {
         // given
         given(productRepository.findById(product.getId())).willReturn(Optional.of(product));
 
@@ -84,8 +83,8 @@ public class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("상품 삭제 실패 테스트")
-    public void testDeleteNotFound() {
+    @DisplayName("상품 삭제 실패")
+    void testDeleteNotFound() {
         // given
         Long productId = 9L;
         given(productRepository.findById(productId)).willReturn(Optional.empty());
