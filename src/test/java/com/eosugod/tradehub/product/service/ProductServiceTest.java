@@ -5,6 +5,8 @@ import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
 import com.eosugod.tradehub.product.entity.Product;
 import com.eosugod.tradehub.product.mapper.ProductMapper;
 import com.eosugod.tradehub.product.repository.ProductRepository;
+import com.eosugod.tradehub.product.vo.Address;
+import com.eosugod.tradehub.product.vo.Money;
 import com.eosugod.tradehub.util.ExpectedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,11 +17,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.any;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -91,5 +94,25 @@ class ProductServiceTest {
 
         // when & then
         assertThrows(ExpectedException.class, () -> productService.deleteProduct(productId));
+    }
+
+    @Test
+    @DisplayName("모든 상품 조회 성공")
+    void testGetAllProducts() {
+        // given
+        List<Product> productList = List.of(
+                new Product(1L, 1L, null, new Money(BigDecimal.valueOf(1000)), "Product 1", "text 1", new Address("1234567890"), Product.SaleState.FOR_SALE, "image_url_1"),
+                new Product(2L, 2L, null, new Money(BigDecimal.valueOf(2000)), "Product 2", "text 2", new Address("9876543210"), Product.SaleState.FOR_SALE, "image_url_2")
+        );
+        given(productRepository.findAll()).willReturn(productList);
+
+        // when
+        List<ResponseProductDto> result = productService.getAllProducts();
+
+        // then
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getId()).isEqualTo(1L);
+        assertThat(result.get(1).getTitle()).isEqualTo("Product 2");
+        then(productRepository).should().findAll();
     }
 }

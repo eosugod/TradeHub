@@ -8,9 +8,11 @@ import com.eosugod.tradehub.product.mapper.ProductMapper;
 import com.eosugod.tradehub.product.repository.ProductRepository;
 import com.eosugod.tradehub.util.ExceptionCode;
 import com.eosugod.tradehub.util.ExpectedException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -40,5 +42,22 @@ public class ProductService {
                 .orElseThrow(() -> new ExpectedException(ExceptionCode.PRODUCT_NOT_FOUND));
         productRepository.delete(product);
         return true;
+    }
+
+    // 단일 상품 조회
+    @Transactional(readOnly = true)
+    public ResponseProductDto getProductById(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ExpectedException(ExceptionCode.PRODUCT_NOT_FOUND));
+        return ProductMapper.toResponseDto(product);
+    }
+
+    // 전체 상품 조회
+    @Transactional(readOnly = true)
+    public List<ResponseProductDto> getAllProducts() {
+        List<Product> products = productRepository.findAll();
+        return products.stream()
+                .map(ProductMapper::toResponseDto)
+                .toList();
     }
 }
