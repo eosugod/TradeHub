@@ -32,4 +32,13 @@ public class ProductService {
         Product savedProduct = ProductMapper.toEntity(requestDto, product);
         return ProductMapper.toResponseDto(savedProduct);
     }
+
+    // 상품 삭제
+    @Transactional
+    public boolean deleteProduct(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ExpectedException(ExceptionCode.PRODUCT_NOT_FOUND));
+        productRepository.delete(product);
+        return true;
+    }
 }
