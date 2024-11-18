@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
@@ -36,5 +38,19 @@ public class ProductController {
     public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
         productService.deleteProduct(productId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 단일 상품 조회
+    @GetMapping("/{productId}")
+    public ResponseEntity<ResponseProductDto> getProduct(@PathVariable Long productId) {
+        ResponseProductDto productDto = productService.getProductById(productId);
+        return ResponseEntity.ok(productDto);
+    }
+
+    // 전체 상품 조회
+    @GetMapping
+    public ResponseEntity<List<ResponseProductDto>> getAllProducts() {
+        List<ResponseProductDto> productDtos = productService.getAllProducts();
+        return ResponseEntity.ok(productDtos);
     }
 }
