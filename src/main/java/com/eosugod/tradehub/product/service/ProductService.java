@@ -65,7 +65,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Page<ResponseProductDto> searchProducts(String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Product> productPage = productRepository.findByTitleOrText(keyword, keyword, pageable);
+        Page<Product> productPage = productRepository.findByTitleOrText(keyword, pageable);
         return productPage.map(ProductMapper::toResponseDto);
     }
 }

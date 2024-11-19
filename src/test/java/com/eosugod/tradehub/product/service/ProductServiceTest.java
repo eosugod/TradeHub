@@ -138,7 +138,7 @@ class ProductServiceTest {
                                           .toList();
 
         Page<Product> productPage = new PageImpl<>(products, PageRequest.of(0, 20), 50);
-        given(productRepository.findByTitleOrText(eq(keyword), eq(keyword), any(Pageable.class)))
+        given(productRepository.findByTitleOrText(eq(keyword), any(Pageable.class)))
                 .willReturn(productPage);
 
         // when
@@ -156,7 +156,7 @@ class ProductServiceTest {
     void testSearchProductsNoKeyword() {
         // given
         Page<Product> emptyPage = Page.empty(PageRequest.of(0, 20));
-        given(productRepository.findByTitleOrText(eq(""), eq(""), any(Pageable.class))).willReturn(emptyPage);
+        given(productRepository.findByTitleOrText(eq(""), any(Pageable.class))).willReturn(emptyPage);
 
         // when
         Page<ResponseProductDto> result = productService.searchProducts("", 0, 20);
