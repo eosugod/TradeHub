@@ -15,10 +15,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -100,19 +105,23 @@ class ProductServiceTest {
     @DisplayName("모든 상품 조회 성공")
     void testGetAllProducts() {
         // given
-        List<Product> productList = List.of(
-                new Product(1L, 1L, null, new Money(BigDecimal.valueOf(1000)), "Product 1", "text 1", new Address("1234567890"), Product.SaleState.FOR_SALE, "image_url_1"),
-                new Product(2L, 2L, null, new Money(BigDecimal.valueOf(2000)), "Product 2", "text 2", new Address("9876543210"), Product.SaleState.FOR_SALE, "image_url_2")
-        );
-        given(productRepository.findAll()).willReturn(productList);
+        List<Product> products = IntStream.range(0, 20)
+                                          .mapToObj(i -> new Product((long) i, 1L, null, new Money(BigDecimal.valueOf(1000 + i)),
+                                                  "Product " + i, "Description " + i,
+                                                  new Address("1234567890"), Product.SaleState.FOR_SALE,
+                                                  "image_url_" + i))
+                                          .toList();
+
+        Page<Product> productPage = new PageImpl<>(products, PageRequest.of(0, 20), 100);
+        given(productRepository.findAll(any(Pageable.class))).willReturn(productPage);
 
         // when
-        List<ResponseProductDto> result = productService.getAllProducts();
+        Page<ResponseProductDto> result = productService.getAllProducts(0, 20);
 
         // then
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0).getId()).isEqualTo(1L);
-        assertThat(result.get(1).getTitle()).isEqualTo("Product 2");
-        then(productRepository).should().findAll();
+        assertThat(result.getTotalElements()).isEqualTo(100); // 총 100개
+        assertThat(result.getContent().size()).isEqualTo(20); // 한 페이지에 20개
+        assertThat(result.getContent().get(0).getTitle()).isEqualTo("Product 0");
+        then(productRepository).should().findAll(any(Pageable.class));
     }
 }

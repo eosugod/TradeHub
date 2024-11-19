@@ -8,11 +8,12 @@ import com.eosugod.tradehub.product.mapper.ProductMapper;
 import com.eosugod.tradehub.product.repository.ProductRepository;
 import com.eosugod.tradehub.util.ExceptionCode;
 import com.eosugod.tradehub.util.ExpectedException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -54,10 +55,9 @@ public class ProductService {
 
     // 전체 상품 조회
     @Transactional(readOnly = true)
-    public List<ResponseProductDto> getAllProducts() {
-        List<Product> products = productRepository.findAll();
-        return products.stream()
-                .map(ProductMapper::toResponseDto)
-                .toList();
+    public Page<ResponseProductDto> getAllProducts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> productPage = productRepository.findAll(pageable);
+        return productPage.map(ProductMapper::toResponseDto);
     }
 }

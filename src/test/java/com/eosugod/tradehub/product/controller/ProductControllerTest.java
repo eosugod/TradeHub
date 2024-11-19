@@ -13,11 +13,15 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -87,18 +91,24 @@ public class ProductControllerTest {
     @DisplayName("모든 상품 조회 요청 성공")
     void testGetAllProducts() throws Exception {
         // given
-        List<ResponseProductDto> reponseDtos = List.of(
-                new ResponseProductDto(1L, 1L, null, BigDecimal.valueOf(1000), "Product 1", "text 1", "1234567890", Product.SaleState.FOR_SALE, "image_url_1"),
-                new ResponseProductDto(2L, 2L, null, BigDecimal.valueOf(2000), "Product 2", "text 2", "9876543210", Product.SaleState.FOR_SALE, "image_url_2")
-        );
-        given(productService.getAllProducts()).willReturn(reponseDtos);
+        List<ResponseProductDto> responseDtos = IntStream.range(0, 20)
+                                                         .mapToObj(i -> new ResponseProductDto((long) i, 1L, null,
+                                                                 BigDecimal.valueOf(1000 + i),
+                                                                 "Product " + i, "Description " + i,
+                                                                 "1234567890", Product.SaleState.FOR_SALE,
+                                                                 "image_url_" + i))
+                                                         .toList();
+        Page<ResponseProductDto> responsePage = new PageImpl<>(responseDtos, PageRequest.of(0, 20), 100);
+        given(productService.getAllProducts(0, 20)).willReturn(responsePage);
 
         // when & then
         mockMvc.perform(get("/products")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[1].title").value("Product 2"));
+                       .param("page", "0")
+                       .param("size", "20")
+                       .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.content.length()").value(20)) // 페이지당 20개
+               .andExpect(jsonPath("$.totalElements").value(100)) // 총 100개 데이터
+               .andExpect(jsonPath("$.content[0].title").value("Product 0"));
     }
 }
