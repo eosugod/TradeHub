@@ -54,4 +54,14 @@ public class ProductController {
         Page<ResponseProductDto> responseDtos = productService.getAllProducts(page, size);
         return ResponseEntity.ok(responseDtos);
     }
+
+    // 검색 상품 조회
+    @GetMapping("/search")
+    public ResponseEntity<Page<ResponseProductDto>> searchProducts(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Page<ResponseProductDto> responseDtos = productService.searchProducts(keyword, page, size);
+        return ResponseEntity.ok(responseDtos);
+    }
 }

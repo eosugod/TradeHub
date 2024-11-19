@@ -124,4 +124,45 @@ class ProductServiceTest {
         assertThat(result.getContent().get(0).getTitle()).isEqualTo("Product 0");
         then(productRepository).should().findAll(any(Pageable.class));
     }
+
+    @Test
+    @DisplayName("상품 검색 조회")
+    void testSearchProducts() {
+        // given
+        String keyword = "sample";
+        List<Product> products = IntStream.range(0, 20)
+                                          .mapToObj(i -> new Product((long) i, 1L, null, new Money(BigDecimal.valueOf(1000 + i)),
+                                                  "Sample Product " + i, "Description " + i,
+                                                  new Address("1234567890"), Product.SaleState.FOR_SALE,
+                                                  "image_url_" + i))
+                                          .toList();
+
+        Page<Product> productPage = new PageImpl<>(products, PageRequest.of(0, 20), 50);
+        given(productRepository.findByTitleOrText(eq(keyword), any(Pageable.class)))
+                .willReturn(productPage);
+
+        // when
+        Page<ResponseProductDto> result = productService.searchProducts(keyword, 0, 20);
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(50); // total 50개
+        assertThat(result.getContent().size()).isEqualTo(20); // page당 20개
+        assertThat(result.getContent().get(0).getTitle()).contains("Sample");
+        assertThat(result.getContent().get(0).getPrice()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("키워드 없는 상품 검색 조회")
+    void testSearchProductsNoKeyword() {
+        // given
+        Page<Product> emptyPage = Page.empty(PageRequest.of(0, 20));
+        given(productRepository.findByTitleOrText(eq(""), any(Pageable.class))).willReturn(emptyPage);
+
+        // when
+        Page<ResponseProductDto> result = productService.searchProducts("", 0, 20);
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(0); // 결과 없음
+        assertThat(result.getContent().size()).isEqualTo(0); // 페이지 데이터 없음
+    }
 }
