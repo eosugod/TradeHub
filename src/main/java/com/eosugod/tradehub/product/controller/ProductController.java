@@ -7,10 +7,9 @@ import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
 import com.eosugod.tradehub.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/products")
@@ -49,8 +48,10 @@ public class ProductController {
 
     // 전체 상품 조회
     @GetMapping
-    public ResponseEntity<List<ResponseProductDto>> getAllProducts() {
-        List<ResponseProductDto> productDtos = productService.getAllProducts();
-        return ResponseEntity.ok(productDtos);
+    public ResponseEntity<Page<ResponseProductDto>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Page<ResponseProductDto> responseDtos = productService.getAllProducts(page, size);
+        return ResponseEntity.ok(responseDtos);
     }
 }
