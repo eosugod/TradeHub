@@ -60,4 +60,12 @@ public class ProductService {
         Page<Product> productPage = productRepository.findAll(pageable);
         return productPage.map(ProductMapper::toResponseDto);
     }
+
+    // 검색 상품 조회
+    @Transactional(readOnly = true)
+    public Page<ResponseProductDto> searchProducts(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> productPage = productRepository.findByTitleOrText(keyword, keyword, pageable);
+        return productPage.map(ProductMapper::toResponseDto);
+    }
 }
