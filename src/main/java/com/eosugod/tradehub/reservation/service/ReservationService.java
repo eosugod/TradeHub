@@ -12,6 +12,9 @@ import com.eosugod.tradehub.user.repository.UserRepository;
 import com.eosugod.tradehub.util.ExceptionCode;
 import com.eosugod.tradehub.util.ExpectedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,5 +54,24 @@ public class ReservationService {
         Reservation reservation = ReservationMapper.toEntity(requestDto, product, buyer);
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationMapper.toResponseDto(savedReservation);
+    }
+
+    // 단일 예약 조회
+    @Transactional(readOnly = true)
+    public ResponseReservationDto getReservation(Long reservaitonId) {
+        Reservation reservation = reservationRepository.findById(reservaitonId)
+                .orElseThrow(() -> new ExpectedException(ExceptionCode.RESERVATION_NOT_FOUND));
+        return ReservationMapper.toResponseDto(reservation);
+    }
+
+    // 해당 상품에 걸린 전체 예약 조회
+    @Transactional(readOnly = true)
+    public Page<ResponseReservationDto> getAllReservations(Long productId, int page, int size) {
+        if(!productRepository.existsById(productId)) {
+            throw new ExpectedException(ExceptionCode.PRODUCT_NOT_FOUND);
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Reservation> reservations = reservationRepository.findAllByProductId(productId, pageable);
+        return reservations.map(ReservationMapper::toResponseDto);
     }
 }

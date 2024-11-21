@@ -5,14 +5,12 @@ import com.eosugod.tradehub.reservation.dto.response.ResponseReservationDto;
 import com.eosugod.tradehub.reservation.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/products/{productId}/reservations")
+@RequestMapping("/reservations")
 @RequiredArgsConstructor
 public class ReservationController {
     private final ReservationService reservationService;
@@ -22,5 +20,21 @@ public class ReservationController {
     public ResponseEntity<ResponseReservationDto> createReservation(@Valid @RequestBody RequestCreateReservationDto requestDto) {
         ResponseReservationDto createdReservation = reservationService.createReservation(requestDto);
         return ResponseEntity.ok(createdReservation);
+    }
+
+    // 단일 예약 조회
+    @GetMapping("/{reservationId}")
+    public ResponseEntity<ResponseReservationDto> getReservation(@PathVariable Long reservationId) {
+        ResponseReservationDto responseDto = reservationService.getReservation(reservationId);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    // 해당 상품에 걸린 전체 예약 조회
+    @GetMapping("/products/{productId}")
+    public ResponseEntity<Page<ResponseReservationDto>> getAllReservations(@PathVariable Long productId,
+                                                                           @RequestParam(defaultValue = "0") int page,
+                                                                           @RequestParam(defaultValue = "20") int size) {
+        Page<ResponseReservationDto> responseDtos = reservationService.getAllReservations(productId, page, size);
+        return ResponseEntity.ok(responseDtos);
     }
 }
