@@ -6,6 +6,7 @@ import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
 import com.eosugod.tradehub.product.entity.Product;
 import com.eosugod.tradehub.product.mapper.ProductMapper;
 import com.eosugod.tradehub.product.repository.ProductRepository;
+import com.eosugod.tradehub.reservation.repository.ReservationRepository;
 import com.eosugod.tradehub.util.ExceptionCode;
 import com.eosugod.tradehub.util.ExpectedException;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final ReservationRepository reservationRepository;
 
     // 상품 생성
     public ResponseProductDto createProduct(RequestCreateProductDto requestDto) {
@@ -41,6 +43,9 @@ public class ProductService {
     public boolean deleteProduct(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ExpectedException(ExceptionCode.PRODUCT_NOT_FOUND));
+        if(reservationRepository.existsByProductId(productId)) {
+            throw new ExpectedException(ExceptionCode.PRODUCT_HAS_RESERVATION);
+        }
         productRepository.delete(product);
         return true;
     }
