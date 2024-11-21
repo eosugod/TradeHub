@@ -10,6 +10,7 @@ import com.eosugod.tradehub.reservation.entity.Reservation;
 import com.eosugod.tradehub.reservation.repository.ReservationRepository;
 import com.eosugod.tradehub.user.entity.Users;
 import com.eosugod.tradehub.user.repository.UserRepository;
+import com.eosugod.tradehub.util.ExpectedException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +37,7 @@ public class ReservationServiceTest {
     UserRepository userRepository;
 
     @Test
-    @DisplayName("예약 생성")
+    @DisplayName("예약 생성 성공")
     void testCreateReservation() {
         // given
         Long productId = 1L;
@@ -54,11 +55,13 @@ public class ReservationServiceTest {
         Product product = Product.builder()
                 .id(productId)
                 .sellerId(sellerId)
+                .state(Product.SaleState.FOR_SALE)
                 .build();
 
         Users user = Users.builder()
                 .id(buyerId)
                 .name("Test Buyer")
+                .cash(new com.eosugod.tradehub.user.vo.Money(BigDecimal.valueOf(10000)))
                 .build();
 
         Reservation reservation = Reservation.builder()
@@ -83,5 +86,96 @@ public class ReservationServiceTest {
         assertEquals(productId, responseDto.getProductId());
         assertEquals(sellerId, responseDto.getSellerId());
         assertEquals(buyerId, responseDto.getBuyerId());
+    }
+
+    @Test
+    @DisplayName("예약 생성 실패1 - 보유 잔액 부족")
+    void testCreateReservationFail1() {
+        // given
+        Long productId = 1L;
+        Long sellerId = 2L;
+        Long buyerId = 3L;
+
+        RequestCreateReservationDto requestDto = RequestCreateReservationDto.builder()
+                                                                            .productId(productId)
+                                                                            .buyerId(buyerId)
+                                                                            .price(BigDecimal.valueOf(10000))
+                                                                            .locationCode("1234567890")
+                                                                            .confirmedAt(LocalDateTime.now())
+                                                                            .build();
+
+        Product product = Product.builder()
+                                 .id(productId)
+                                 .sellerId(sellerId)
+                                 .state(Product.SaleState.FOR_SALE)
+                                 .build();
+
+        Users user = Users.builder()
+                          .id(buyerId)
+                          .name("Test Buyer")
+                          .cash(new com.eosugod.tradehub.user.vo.Money(BigDecimal.valueOf(5000))) // 보유 잔액
+                          .build();
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(userRepository.findById(buyerId)).thenReturn(Optional.of(user));
+
+        // when then
+        assertThrows(ExpectedException.class, () -> reservationService.createReservation(requestDto));
+    }
+
+    @Test
+    @DisplayName("예약 생성 실패2 - 판매중인 상품이 아님")
+    void testCreateReservationFail2() {
+        // given
+        Long productId = 1L;
+        Long sellerId = 2L;
+        Long buyerId = 3L;
+
+        RequestCreateReservationDto requestDto = RequestCreateReservationDto.builder()
+                                                                            .productId(productId)
+                                                                            .buyerId(buyerId)
+                                                                            .price(BigDecimal.valueOf(10000))
+                                                                            .locationCode("1234567890")
+                                                                            .confirmedAt(LocalDateTime.now())
+                                                                            .build();
+
+        Product product = Product.builder()
+                                 .id(productId)
+                                 .sellerId(sellerId)
+                                 .state(Product.SaleState.RESERVED) // 이미 예약된 상품
+                                 .build();
+
+        Users user = Users.builder()
+                          .id(buyerId)
+                          .name("Test Buyer")
+                          .cash(new com.eosugod.tradehub.user.vo.Money(BigDecimal.valueOf(10000)))
+                          .build();
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(userRepository.findById(buyerId)).thenReturn(Optional.of(user));
+
+        // when then
+        assertThrows(ExpectedException.class, () -> reservationService.createReservation(requestDto));
+    }
+
+    @Test
+    @DisplayName("예약 생성 실패3 - 존재하지 않는 상품")
+    void testCreateReservationFail3() {
+        // given
+        Long productId = 1L;
+        Long buyerId = 3L;
+
+        RequestCreateReservationDto requestDto = RequestCreateReservationDto.builder()
+                                                                            .productId(productId)  // 존재하지 않는 상품 ID
+                                                                            .buyerId(buyerId)
+                                                                            .price(BigDecimal.valueOf(10000))
+                                                                            .locationCode("1234567890")
+                                                                            .confirmedAt(LocalDateTime.now())
+                                                                            .build();
+
+        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+
+        // when then
+        assertThrows(ExpectedException.class, () -> reservationService.createReservation(requestDto));
     }
 }
