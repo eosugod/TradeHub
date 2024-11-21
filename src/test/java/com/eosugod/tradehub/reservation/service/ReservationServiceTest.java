@@ -17,10 +17,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -177,5 +183,33 @@ public class ReservationServiceTest {
 
         // when then
         assertThrows(ExpectedException.class, () -> reservationService.createReservation(requestDto));
+    }
+
+    @Test
+    @DisplayName("해당 상품에 대한 전체 예약 조회")
+    void testGetReservationsByProduct() {
+        // given
+        Long productId = 1L;
+        List<Reservation> reservations = IntStream.range(0, 10)
+                                                  .mapToObj(i -> Reservation.builder()
+                                                                            .id((long) i)
+                                                                            .product(Product.builder().id(productId).build())
+                                                                            .user(Users.builder().id((long) i).build())
+                                                                            .price(new Money(BigDecimal.valueOf(10000)))
+                                                                            .locationCode(new Address("1234567890"))
+                                                                            .confirmedAt(LocalDateTime.now().minusDays(i))
+                                                                            .build())
+                                                  .collect(Collectors.toList());
+
+        Page<Reservation> reservationPage = new PageImpl<>(reservations);
+
+        when(reservationRepository.findAllByProductId(eq(productId), any(Pageable.class))).thenReturn(reservationPage);
+
+        // when
+        Page<ResponseReservationDto> response = reservationService.getAllReservations(productId, 0, 20);
+
+        // then
+        assertNotNull(response);
+        assertEquals(10, response.getContent().size());
     }
 }
