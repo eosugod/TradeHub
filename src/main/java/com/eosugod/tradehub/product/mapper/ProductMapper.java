@@ -1,5 +1,6 @@
 package com.eosugod.tradehub.product.mapper;
 
+import com.eosugod.tradehub.product.domain.ProductDomain;
 import com.eosugod.tradehub.product.dto.request.RequestCreateProductDto;
 import com.eosugod.tradehub.product.dto.request.RequestUpdateProductDto;
 import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
@@ -34,6 +35,44 @@ public class ProductMapper {
                 .state(product.getState())
                 .thumbNailImage(requestDto.getThumbNailImage())
                 .build();
+    }
+
+    public static ProductDomain persistenceToDomain(Product product) {
+        return ProductDomain.builder()
+                .id(product.getId())
+                .sellerId(product.getSellerId())
+                .price(product.getPrice())
+                .title(product.getTitle())
+                .text(product.getText())
+                .locationCode(product.getLocationCode())
+                .state(product.getState())
+                .thumbNailImage(product.getThumbNailImage())
+                .build();
+    }
+
+    public static Product dtoToPersistence(RequestCreateProductDto dto) {
+        return Product.builder()
+                      .sellerId(dto.getSellerId())
+                      .price(new Money(dto.getPrice()))
+                      .title(dto.getTitle())
+                      .text(dto.getText())
+                      .locationCode(new Address(dto.getLocationCode()))
+                      .state(dto.getState())
+                      .thumbNailImage(dto.getThumbNailImage())
+                      .build();
+    }
+
+    public static ResponseProductDto domainToDto(ProductDomain productDomain) {
+        return ResponseProductDto.builder()
+                                 .id(productDomain.getId())
+                                 .sellerId(productDomain.getSellerId())
+                                 .price(productDomain.getPrice().getValue())
+                                 .title(productDomain.getTitle())
+                                 .text(productDomain.getText())
+                                 .locationCode(productDomain.getLocationCode().getValue())
+                                 .state(productDomain.getState())
+                                 .thumbNailImage(productDomain.getThumbNailImage())
+                                 .build();
     }
 
     public static ResponseProductDto toResponseDto(Product product) {
