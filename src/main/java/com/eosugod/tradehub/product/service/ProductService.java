@@ -27,17 +27,16 @@ public class ProductService {
 
     // 상품 생성
     public ResponseProductDto createProduct(RequestCreateProductDto dto) {
-        ProductDomain productDomain = productPort.save(dto);
-        return ProductMapper.domainToDto(productDomain);
+        Product product = ProductMapper.dtoToPersistence(dto);
+        ProductDomain productDomain = ProductMapper.persistenceToDomain(product);
+        return ProductMapper.domainToDto(productPort.save(productDomain));
     }
 
     // 상품 수정
     @Transactional
-    public ResponseProductDto updateProduct(Long productId, RequestUpdateProductDto requestDto) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ExpectedException(ExceptionCode.PRODUCT_NOT_FOUND));
-        Product savedProduct = ProductMapper.toEntity(requestDto, product);
-        return ProductMapper.toResponseDto(savedProduct);
+    public ResponseProductDto updateProduct(Long id, RequestUpdateProductDto dto) {
+        ProductDomain productDomain = productPort.findById(id).update(dto);
+        return ProductMapper.domainToDto(productPort.save(productDomain));
     }
 
     // 상품 삭제
