@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface ProductPort {
     ProductDomain save(ProductDomain productDomain);
+    void delete(ProductDomain productDomain);
     Optional<ProductDomain> findById(Long id);
     Page<ProductDomain> findAll(Pageable pageable);
 }

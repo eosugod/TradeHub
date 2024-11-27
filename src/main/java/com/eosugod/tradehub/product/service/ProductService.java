@@ -44,14 +44,9 @@ public class ProductService {
     // 상품 삭제
     @Transactional
     public boolean deleteProduct(Long productId) {
-        Product product = productRepository.findById(productId)
+        ProductDomain productDomain = productPort.findById(productId)
                 .orElseThrow(() -> new ExpectedException(ExceptionCode.PRODUCT_NOT_FOUND));
-        if(reservationRepository.existsByProductId(productId)) {
-            throw new ExpectedException(ExceptionCode.PRODUCT_HAS_RESERVATION);
-        }
-        productRepository.delete(product);
-
-
+        productPort.delete(productDomain);
         return true;
     }
 

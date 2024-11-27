@@ -24,6 +24,12 @@ public class ProductJpaAdapter implements ProductPort {
     }
 
     @Override
+    public void delete(ProductDomain productDomain) {
+        Product product = ProductMapper.domainToPersistence(productDomain);
+        productRepository.delete(product);
+    }
+
+    @Override
     public Optional<ProductDomain> findById(Long id) {
         return productRepository.findById(id)
                 .map(ProductMapper::persistenceToDomain);
