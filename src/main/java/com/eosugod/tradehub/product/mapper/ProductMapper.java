@@ -2,7 +2,6 @@ package com.eosugod.tradehub.product.mapper;
 
 import com.eosugod.tradehub.product.domain.ProductDomain;
 import com.eosugod.tradehub.product.dto.request.RequestCreateProductDto;
-import com.eosugod.tradehub.product.dto.request.RequestUpdateProductDto;
 import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
 import com.eosugod.tradehub.product.entity.Product;
 import com.eosugod.tradehub.product.vo.Address;
@@ -16,10 +15,10 @@ public class ProductMapper {
         return ProductDomain.builder()
                 .id(product.getId())
                 .sellerId(product.getSellerId())
-                .price(product.getPrice())
+                .price(new Money(product.getPrice().getValue()))
                 .title(product.getTitle())
                 .text(product.getText())
-                .locationCode(product.getLocationCode())
+                .locationCode(new Address(product.getLocationCode().getValue()))
                 .state(product.getState())
                 .thumbNailImage(product.getThumbNailImage())
                 .build();
