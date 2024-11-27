@@ -40,4 +40,10 @@ public class ProductJpaAdapter implements ProductPort {
         return productRepository.findAll(pageable)
                 .map(ProductMapper::persistenceToDomain);
     }
+
+    @Override
+    public Page<ProductDomain> searchByKeyword(String keyword, Pageable pageable) {
+        return productRepository.findByTitleOrText(keyword, pageable)
+                .map(ProductMapper::persistenceToDomain);
+    }
 }

@@ -12,4 +12,5 @@ public interface ProductPort {
     void delete(ProductDomain productDomain);
     Optional<ProductDomain> findById(Long id);
     Page<ProductDomain> findAll(Pageable pageable);
+    Page<ProductDomain> searchByKeyword(String keyword, Pageable pageable);
 }
