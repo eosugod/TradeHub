@@ -2,6 +2,7 @@ package com.eosugod.tradehub.product.service;
 
 import com.eosugod.tradehub.product.domain.ProductDomain;
 import com.eosugod.tradehub.product.dto.request.RequestCreateProductDto;
+import com.eosugod.tradehub.product.dto.request.RequestUpdateProductDto;
 import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
 import com.eosugod.tradehub.product.entity.Product;
 import com.eosugod.tradehub.product.mapper.ProductMapper;
@@ -66,22 +67,80 @@ class ProductServiceTest {
                 .thumbNailImage("image_url")
                 .build();
 
-        given(productPort.save(dto)).willReturn(expect);
+        given(productPort.save(any(ProductDomain.class))).willReturn(expect);
 
         // when
-        productService.createProduct(dto);
+        ResponseProductDto responseDto = productService.createProduct(dto);
 
         // then
-        assertNotNull(dto);
-        assertEquals(dto.getSellerId(), expect.getSellerId());
-        assertEquals(dto.getPrice(), expect.getPrice().getValue());
-        assertEquals(dto.getTitle(), expect.getTitle());
-        assertEquals(dto.getText(), expect.getText());
-        assertEquals(dto.getLocationCode(), expect.getLocationCode().getValue());
-        assertEquals(dto.getState(), expect.getState());
-        assertEquals(dto.getThumbNailImage(), expect.getThumbNailImage());
+        assertNotNull(responseDto);
+        assertEquals(expect.getSellerId(), responseDto.getSellerId());
+        assertEquals(expect.getPrice().getValue(), responseDto.getPrice());
+        assertEquals(expect.getTitle(), responseDto.getTitle());
+        assertEquals(expect.getText(), responseDto.getText());
+        assertEquals(expect.getLocationCode().getValue(), responseDto.getLocationCode());
+        assertEquals(expect.getState(), responseDto.getState());
+        assertEquals(expect.getThumbNailImage(), responseDto.getThumbNailImage());
 
-        verify(productPort, times(1)).save(any());
+        // Verify
+        verify(productPort, times(1)).save(any(ProductDomain.class));
+    }
+
+    @Test
+    @DisplayName("상품 수정")
+    void testUpdateProduct() {
+        // given
+        Long productId = 1L;
+
+        ProductDomain productDomain = ProductDomain.builder()
+                .id(productId)
+                .sellerId(2L)
+                .price(new Money(BigDecimal.valueOf(1000)))
+                .title("origin title")
+                .text("origin text")
+                .locationCode(new Address("01234567"))
+                .state(Product.SaleState.FOR_SALE)
+                .thumbNailImage("test_url")
+                .build();
+
+        RequestUpdateProductDto dto = RequestUpdateProductDto.builder()
+                .price(BigDecimal.valueOf(2000))
+                .title("updated title")
+                .text("updated text")
+                .locationCode("98765432")
+                .thumbNailImage("updated_url")
+                .build();
+
+        ProductDomain expect = ProductDomain.builder()
+                .id(productId)
+                .sellerId(2L)
+                .price(new Money(BigDecimal.valueOf(2000)))
+                .title("updated title")
+                .text("updated text")
+                .locationCode(new Address("98765432"))
+                .state(Product.SaleState.FOR_SALE)
+                .thumbNailImage("updated_url")
+                .build();
+
+        given(productPort.findById(productId)).willReturn(productDomain);
+        given(productPort.save(any(ProductDomain.class))).willReturn(expect);
+
+        // when
+        ResponseProductDto responseDto = productService.updateProduct(productId, dto);
+
+        // then
+        assertNotNull(responseDto);
+        assertEquals(expect.getId(), responseDto.getId());
+        assertEquals(expect.getPrice().getValue(), responseDto.getPrice());
+        assertEquals(expect.getTitle(), responseDto.getTitle());
+        assertEquals(expect.getText(), responseDto.getText());
+        assertEquals(expect.getLocationCode().getValue(), responseDto.getLocationCode());
+        assertEquals(expect.getState(), responseDto.getState());
+        assertEquals(expect.getThumbNailImage(), responseDto.getThumbNailImage());
+
+        // Verify
+        verify(productPort, times(1)).findById(productId);
+        verify(productPort, times(1)).save(any(ProductDomain.class));
     }
 
 //    @Test

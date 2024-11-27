@@ -4,5 +4,6 @@ import com.eosugod.tradehub.product.domain.ProductDomain;
 import com.eosugod.tradehub.product.dto.request.RequestCreateProductDto;
 
 public interface ProductPort {
-    ProductDomain save(RequestCreateProductDto dto);
+    ProductDomain save(ProductDomain productDomain);
+    ProductDomain findById(Long id);
 }
