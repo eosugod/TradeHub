@@ -143,25 +143,39 @@ class ProductServiceTest {
         verify(productPort, times(1)).save(any(ProductDomain.class));
     }
 
-//    @Test
-//    @DisplayName("상품 삭제 성공")
-//    void testDeleteProduct() {
-//        // given
-//        given(productRepository.findById(product.getId())).willReturn(Optional.of(product));
-//
-//        // when
-//        productService.deleteProduct(product.getId());
-//
-//        // then
-//        verify(productRepository).delete(product);
-//    }
+    @Test
+    @DisplayName("상품 삭제 성공")
+    void deleteProduct_Success() {
+        // given
+        Long productId = 1L;
+        ProductDomain productDomain = ProductDomain.builder()
+                                                   .id(productId)
+                                                   .sellerId(2L)
+                                                   .price(new Money(BigDecimal.valueOf(1000)))
+                                                   .title("Sample Product")
+                                                   .text("This is a sample product")
+                                                   .locationCode(new Address("01234567"))
+                                                   .state(Product.SaleState.FOR_SALE)
+                                                   .thumbNailImage("image_url")
+                                                   .build();
+
+        given(productPort.findById(productId)).willReturn(Optional.of(productDomain));
+
+        // when
+        boolean result = productService.deleteProduct(productId);
+
+        // then
+        assertTrue(result);
+        verify(productPort, times(1)).findById(productId);
+        verify(productPort, times(1)).delete(productDomain);
+    }
 
     @Test
     @DisplayName("상품 삭제 실패")
     void testDeleteNotFound() {
         // given
         Long productId = 9L;
-        given(productRepository.findById(productId)).willReturn(Optional.empty());
+        given(productPort.findById(productId)).willReturn(Optional.empty());
 
         // when & then
         assertThrows(ExpectedException.class, () -> productService.deleteProduct(productId));
