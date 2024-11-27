@@ -35,8 +35,10 @@ public class ProductService {
     // 상품 수정
     @Transactional
     public ResponseProductDto updateProduct(Long id, RequestUpdateProductDto dto) {
-        ProductDomain productDomain = productPort.findById(id).update(dto);
-        return ProductMapper.domainToDto(productPort.save(productDomain));
+        ProductDomain productDomain = productPort.findById(id)
+                .orElseThrow(() -> new ExpectedException(ExceptionCode.PRODUCT_NOT_FOUND));
+        ProductDomain updatedProductDomain = productDomain.update(dto);
+        return ProductMapper.domainToDto(productPort.save(updatedProductDomain));
     }
 
     // 상품 삭제
@@ -48,23 +50,25 @@ public class ProductService {
             throw new ExpectedException(ExceptionCode.PRODUCT_HAS_RESERVATION);
         }
         productRepository.delete(product);
+
+
         return true;
     }
 
     // 단일 상품 조회
     @Transactional(readOnly = true)
-    public ResponseProductDto getProductById(Long productId) {
-        Product product = productRepository.findById(productId)
+    public ResponseProductDto getProductById(Long id) {
+        ProductDomain productDomain = productPort.findById(id)
                 .orElseThrow(() -> new ExpectedException(ExceptionCode.PRODUCT_NOT_FOUND));
-        return ProductMapper.toResponseDto(product);
+        return ProductMapper.domainToDto(productDomain);
     }
 
     // 전체 상품 조회
     @Transactional(readOnly = true)
     public Page<ResponseProductDto> getAllProducts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Product> productPage = productRepository.findAll(pageable);
-        return productPage.map(ProductMapper::toResponseDto);
+        Page<ProductDomain> productDomainPage = productPort.findAll(pageable);
+        return productDomainPage.map(ProductMapper::domainToDto);
     }
 
     // 검색 상품 조회

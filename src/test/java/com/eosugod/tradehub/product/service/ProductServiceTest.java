@@ -122,7 +122,7 @@ class ProductServiceTest {
                 .thumbNailImage("updated_url")
                 .build();
 
-        given(productPort.findById(productId)).willReturn(productDomain);
+        given(productPort.findById(productId)).willReturn(Optional.of(productDomain));
         given(productPort.save(any(ProductDomain.class))).willReturn(expect);
 
         // when
@@ -168,27 +168,91 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("모든 상품 조회 성공")
-    void testGetAllProducts() {
+    @DisplayName("단일 상품 조회")
+    void testGetProduct() {
         // given
-        List<Product> products = IntStream.range(0, 20)
-                                          .mapToObj(i -> new Product((long) i, 1L, null, new Money(BigDecimal.valueOf(1000 + i)),
-                                                  "Product " + i, "Description " + i,
-                                                  new Address("1234567890"), Product.SaleState.FOR_SALE,
-                                                  "image_url_" + i))
-                                          .toList();
+        Long productId = 1L;
 
-        Page<Product> productPage = new PageImpl<>(products, PageRequest.of(0, 20), 100);
-        given(productRepository.findAll(any(Pageable.class))).willReturn(productPage);
+        ProductDomain productDomain = ProductDomain.builder()
+                                                   .id(productId)
+                                                   .sellerId(2L)
+                                                   .price(new Money(BigDecimal.valueOf(1000)))
+                                                   .title("sample title")
+                                                   .text("sample text")
+                                                   .locationCode(new Address("0123456789"))
+                                                   .state(Product.SaleState.FOR_SALE)
+                                                   .thumbNailImage("test_url")
+                                                   .build();
+
+        given(productPort.findById(productId)).willReturn(Optional.of(productDomain));
 
         // when
-        Page<ResponseProductDto> result = productService.getAllProducts(0, 20);
+        ResponseProductDto responseDto = productService.getProductById(productId);
 
         // then
-        assertThat(result.getTotalElements()).isEqualTo(100); // 총 100개
-        assertThat(result.getContent().size()).isEqualTo(20); // 한 페이지에 20개
-        assertThat(result.getContent().get(0).getTitle()).isEqualTo("Product 0");
-        then(productRepository).should().findAll(any(Pageable.class));
+        assertNotNull(responseDto);
+        assertEquals(productDomain.getId(), responseDto.getId());
+        assertEquals(productDomain.getTitle(), responseDto.getTitle());
+        assertEquals(productDomain.getPrice().getValue(), responseDto.getPrice());
+        assertEquals(productDomain.getLocationCode().getValue(), responseDto.getLocationCode());
+        assertEquals(productDomain.getState(), responseDto.getState());
+
+        verify(productPort, times(1)).findById(productId);
+    }
+
+    @Test
+    @DisplayName("모든 상품 조회")
+    void testGetAllProducts() {
+        // given
+        int page = 0;
+        int size = 2;
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<ProductDomain> productDomains = List.of(
+                ProductDomain.builder()
+                             .id(1L)
+                             .sellerId(2L)
+                             .price(new Money(BigDecimal.valueOf(1000)))
+                             .title("Product 1")
+                             .text("This is product 1")
+                             .locationCode(new Address("0123456789"))
+                             .state(Product.SaleState.FOR_SALE)
+                             .thumbNailImage("image1_url")
+                             .build(),
+                ProductDomain.builder()
+                             .id(2L)
+                             .sellerId(3L)
+                             .price(new Money(BigDecimal.valueOf(2000)))
+                             .title("Product 2")
+                             .text("This is product 2")
+                             .locationCode(new Address("9876543210"))
+                             .state(Product.SaleState.SOLD_OUT)
+                             .thumbNailImage("image2_url")
+                             .build()
+        );
+
+        Page<ProductDomain> productDomainPage = new PageImpl<>(productDomains, pageable, productDomains.size());
+        given(productPort.findAll(pageable)).willReturn(productDomainPage);
+
+        // when
+        Page<ResponseProductDto> responseDtos = productService.getAllProducts(page, size);
+
+        // then
+        assertNotNull(responseDtos);
+        assertEquals(productDomains.size(), responseDtos.getTotalElements());
+
+        for (int i = 0; i < productDomains.size(); i++) {
+            ProductDomain productDomain = productDomains.get(i);
+            ResponseProductDto responseDto = responseDtos.getContent().get(i);
+
+            assertEquals(productDomain.getId(), responseDto.getId());
+            assertEquals(productDomain.getTitle(), responseDto.getTitle());
+            assertEquals(productDomain.getPrice().getValue(), responseDto.getPrice());
+            assertEquals(productDomain.getLocationCode().getValue(), responseDto.getLocationCode());
+            assertEquals(productDomain.getState(), responseDto.getState());
+        }
+
+        verify(productPort, times(1)).findAll(pageable);
     }
 
     @Test
