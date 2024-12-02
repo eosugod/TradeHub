@@ -13,6 +13,7 @@ public class UserMapper {
 
     public static Users domainToPersistence(UserDomain userDomain) {
         return Users.builder()
+                    .id(userDomain.getId())
                     .name(userDomain.getName())
                     .account(userDomain.getAccount())
                     .nickName(userDomain.getNickName())
@@ -27,7 +28,6 @@ public class UserMapper {
                          .name(usersEntity.getName())
                          .account(usersEntity.getAccount())
                          .address(usersEntity.getAddress())
-                         .account(usersEntity.getAccount())
                          .cash(usersEntity.getCash())
                          .nickName(usersEntity.getNickName())
                          .build();

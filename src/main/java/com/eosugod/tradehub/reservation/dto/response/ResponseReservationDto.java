@@ -17,5 +17,5 @@ public class ResponseReservationDto {
     private Long buyerId;
     private BigDecimal price;
     private String locationCode;
-    private LocalDateTime confirmedAt;
+    private String confirmedAt;
 }

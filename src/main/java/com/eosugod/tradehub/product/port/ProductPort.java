@@ -1,7 +1,6 @@
 package com.eosugod.tradehub.product.port;
 
 import com.eosugod.tradehub.product.domain.ProductDomain;
-import com.eosugod.tradehub.product.dto.request.RequestCreateProductDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
