@@ -29,12 +29,12 @@ public class ReservationController {
         return ResponseEntity.ok(responseDto);
     }
 
-    // 해당 상품에 걸린 전체 예약 조회
-    @GetMapping("/products/{productId}")
-    public ResponseEntity<Page<ResponseReservationDto>> getAllReservations(@PathVariable Long productId,
-                                                                           @RequestParam(defaultValue = "0") int page,
-                                                                           @RequestParam(defaultValue = "20") int size) {
-        Page<ResponseReservationDto> responseDtos = reservationService.getAllReservations(productId, page, size);
-        return ResponseEntity.ok(responseDtos);
-    }
+//    // 해당 상품에 걸린 전체 예약 조회
+//    @GetMapping("/products/{productId}")
+//    public ResponseEntity<Page<ResponseReservationDto>> getAllReservations(@PathVariable Long productId,
+//                                                                           @RequestParam(defaultValue = "0") int page,
+//                                                                           @RequestParam(defaultValue = "20") int size) {
+//        Page<ResponseReservationDto> responseDtos = reservationService.getAllReservations(productId, page, size);
+//        return ResponseEntity.ok(responseDtos);
+//    }
 }

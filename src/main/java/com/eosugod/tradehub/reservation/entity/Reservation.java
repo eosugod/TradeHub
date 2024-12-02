@@ -21,29 +21,20 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long sellerId;
-    private Long buyerId;
-    @Embedded
-    private Money price;
-    @Embedded
-    private Address locationCode;
-    private LocalDateTime confirmedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "buyer_id")
+    private Users buyer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private Users user;
+    @Embedded
+    private Money price;
 
-    public void setProduct(Product product) {
-        this.product = product;
-        this.sellerId = product.getSellerId();
-    }
+    @Embedded
+    private Address locationCode;
 
-    public void setUser(Users user) {
-        this.user = user;
-        this.buyerId = user.getId();
-    }
+    private LocalDateTime confirmedAt;
 }

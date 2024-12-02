@@ -61,19 +61,5 @@ public class ProductMapper {
                                  .thumbNailImage(productDomain.getThumbNailImage())
                                  .build();
     }
-
-    public static ResponseProductDto toResponseDto(Product product) {
-        return ResponseProductDto.builder()
-                .id(product.getId())
-                .sellerId(product.getSellerId())
-                .buyerId(product.getBuyerId())
-                .price(product.getPrice().getValue())
-                .title(product.getTitle())
-                .text(product.getText())
-                .locationCode(product.getLocationCode().getValue())
-                .state(product.getState())
-                .thumbNailImage(product.getThumbNailImage())
-                .build();
-    }
 }
 

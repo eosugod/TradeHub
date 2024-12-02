@@ -36,8 +36,6 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
     @Mock
-    private ProductRepository productRepository;
-    @Mock
     private ProductPort productPort;
     @InjectMocks
     private ProductService productService;
