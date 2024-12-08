@@ -1,4 +1,4 @@
-package com.eosugod.tradehub.product.vo;
+package com.eosugod.tradehub.vo;
 
 import jakarta.persistence.Embeddable;
 import lombok.NoArgsConstructor;

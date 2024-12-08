@@ -41,4 +41,16 @@ public class ReservationJpaAdapter implements ReservationPort {
     public boolean existsByProductIdAndBuyerId(Long productId, Long buyerId) {
         return reservationRepository.existsByProductIdAndBuyerId(productId, buyerId);
     }
+
+    @Override
+    public Page<ReservationDomain> findAllByBuyerIdAndState(Long buyerId, Reservation.ReservationState state, Pageable pageable) {
+        return reservationRepository.findAllByBuyerIdAndState(buyerId, state, pageable)
+                                    .map(ReservationMapper::persistenceToDomain);
+    }
+
+    @Override
+    public Page<ReservationDomain> findAllBySellerIdAndState(Long sellerId, Reservation.ReservationState state, Pageable pageable) {
+        return reservationRepository.findAllBySellerIdAndState(sellerId, state, pageable)
+                                    .map(ReservationMapper::persistenceToDomain);
+    }
 }

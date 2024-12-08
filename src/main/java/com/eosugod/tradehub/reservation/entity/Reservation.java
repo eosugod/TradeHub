@@ -2,8 +2,8 @@ package com.eosugod.tradehub.reservation.entity;
 
 import com.eosugod.tradehub.product.entity.Product;
 import com.eosugod.tradehub.user.entity.Users;
-import com.eosugod.tradehub.product.vo.Address;
-import com.eosugod.tradehub.product.vo.Money;
+import com.eosugod.tradehub.vo.Address;
+import com.eosugod.tradehub.vo.Money;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,4 +37,13 @@ public class Reservation {
     private Address locationCode;
 
     private LocalDateTime confirmedAt;
+
+    private ReservationState state;
+
+    public enum ReservationState {
+        PENDING, // 예약 대기
+        CONFIRMED, // 예약 확정
+        CANCELLED, // 예약 취소
+        COMPLETED // 거래 완료
+    }
 }

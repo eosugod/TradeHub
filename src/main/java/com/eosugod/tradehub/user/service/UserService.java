@@ -3,6 +3,7 @@ package com.eosugod.tradehub.user.service;
 import com.eosugod.tradehub.user.domain.UserDomain;
 import com.eosugod.tradehub.user.dto.request.RequestCreateUserDto;
 import com.eosugod.tradehub.user.dto.response.ResponseUserDto;
+import com.eosugod.tradehub.user.entity.Users;
 import com.eosugod.tradehub.user.mapper.UserMapper;
 import com.eosugod.tradehub.user.port.UserPort;
 import com.eosugod.tradehub.user.validator.UserValidator;
@@ -21,8 +22,9 @@ public class UserService {
         userValidator.existAccount(dto.account());
         userValidator.existNickName(dto.nickName());
 
-        UserDomain userDomain = userPort.save(dto);
-        return UserMapper.domainToDto(userDomain);
+        Users user = UserMapper.dtoTopersistence(dto);
+        UserDomain userDomain = UserMapper.persistenceToDomain(user);
+        return UserMapper.domainToDto(userPort.save(userDomain));
     }
 
     @Transactional(readOnly = true)

@@ -1,7 +1,7 @@
 package com.eosugod.tradehub.product.entity;
 
-import com.eosugod.tradehub.product.vo.Address;
-import com.eosugod.tradehub.product.vo.Money;
+import com.eosugod.tradehub.vo.Address;
+import com.eosugod.tradehub.vo.Money;
 import jakarta.persistence.*;
 import lombok.*;
 

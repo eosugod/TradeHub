@@ -1,8 +1,8 @@
 package com.eosugod.tradehub.reservation.mapper;
 
 import com.eosugod.tradehub.product.mapper.ProductMapper;
-import com.eosugod.tradehub.product.vo.Address;
-import com.eosugod.tradehub.product.vo.Money;
+import com.eosugod.tradehub.vo.Address;
+import com.eosugod.tradehub.vo.Money;
 import com.eosugod.tradehub.reservation.domain.ReservationDomain;
 import com.eosugod.tradehub.reservation.dto.response.ResponseReservationDto;
 import com.eosugod.tradehub.user.entity.Users;
@@ -10,11 +10,8 @@ import com.eosugod.tradehub.product.entity.Product;
 import com.eosugod.tradehub.reservation.dto.request.RequestCreateReservationDto;
 import com.eosugod.tradehub.reservation.entity.Reservation;
 import com.eosugod.tradehub.user.mapper.UserMapper;
-import jakarta.persistence.Entity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReservationMapper {
@@ -26,6 +23,7 @@ public class ReservationMapper {
                 .price(new Money(reservation.getPrice().getValue()))
                 .locationCode(new Address(reservation.getLocationCode().getValue()))
                 .confirmedAt(reservation.getConfirmedAt())
+                .state(reservation.getState())
                 .build();
     }
 
@@ -36,6 +34,7 @@ public class ReservationMapper {
                 .price(new Money(dto.getPrice()))
                 .locationCode(new Address(dto.getLocationCode()))
                 .confirmedAt(dto.getConfirmedAt())
+                .state(Reservation.ReservationState.PENDING)
                 .build();
     }
 
@@ -47,6 +46,7 @@ public class ReservationMapper {
                 .price(new Money(reservationDomain.getPrice().getValue()))
                 .locationCode(new Address(reservationDomain.getLocationCode().getValue()))
                 .confirmedAt(reservationDomain.getConfirmedAt())
+                .state(reservationDomain.getState())
                 .build();
     }
 
@@ -59,6 +59,7 @@ public class ReservationMapper {
                 .price(reservationDomain.getPrice().getValue())
                 .locationCode(reservationDomain.getLocationCode().getValue())
                 .confirmedAt(String.valueOf(reservationDomain.getConfirmedAt()))
+                .state(reservationDomain.getState())
                 .build();
     }
 }

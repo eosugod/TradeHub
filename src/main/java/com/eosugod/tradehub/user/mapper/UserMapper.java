@@ -4,8 +4,8 @@ import com.eosugod.tradehub.user.domain.UserDomain;
 import com.eosugod.tradehub.user.dto.request.RequestCreateUserDto;
 import com.eosugod.tradehub.user.dto.response.ResponseUserDto;
 import com.eosugod.tradehub.user.entity.Users;
-import com.eosugod.tradehub.user.vo.Address;
-import com.eosugod.tradehub.user.vo.Money;
+import com.eosugod.tradehub.vo.Address;
+import com.eosugod.tradehub.vo.Money;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -4,8 +4,8 @@ import com.eosugod.tradehub.product.domain.ProductDomain;
 import com.eosugod.tradehub.product.dto.request.RequestCreateProductDto;
 import com.eosugod.tradehub.product.dto.response.ResponseProductDto;
 import com.eosugod.tradehub.product.entity.Product;
-import com.eosugod.tradehub.product.vo.Address;
-import com.eosugod.tradehub.product.vo.Money;
+import com.eosugod.tradehub.vo.Address;
+import com.eosugod.tradehub.vo.Money;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

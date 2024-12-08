@@ -4,30 +4,30 @@ import com.eosugod.tradehub.product.domain.ProductDomain;
 import com.eosugod.tradehub.product.entity.Product;
 import com.eosugod.tradehub.product.mapper.ProductMapper;
 import com.eosugod.tradehub.product.port.ProductPort;
-import com.eosugod.tradehub.product.repository.ProductRepository;
 import com.eosugod.tradehub.reservation.domain.ReservationDomain;
 import com.eosugod.tradehub.reservation.dto.request.RequestCreateReservationDto;
 import com.eosugod.tradehub.reservation.dto.response.ResponseReservationDto;
 import com.eosugod.tradehub.reservation.entity.Reservation;
 import com.eosugod.tradehub.reservation.mapper.ReservationMapper;
 import com.eosugod.tradehub.reservation.port.ReservationPort;
-import com.eosugod.tradehub.reservation.repository.ReservationRepository;
 import com.eosugod.tradehub.user.domain.UserDomain;
 import com.eosugod.tradehub.user.entity.Users;
 import com.eosugod.tradehub.user.mapper.UserMapper;
 import com.eosugod.tradehub.user.port.UserPort;
-import com.eosugod.tradehub.user.repository.UserRepository;
+import com.eosugod.tradehub.vo.Money;
 import com.eosugod.tradehub.util.ExceptionCode;
 import com.eosugod.tradehub.util.ExpectedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +72,75 @@ public class ReservationService {
     public ResponseReservationDto getReservation(Long id) {
         ReservationDomain reservationDomain = reservationPort.findById(id)
                 .orElseThrow(() -> new ExpectedException(ExceptionCode.RESERVATION_NOT_FOUND));
+        return ReservationMapper.domainToDto(reservationDomain);
+    }
+
+    // 해당 상품에 걸린 전체 예약 조회
+    @Transactional(readOnly = true)
+    public Page<ResponseReservationDto> getAllReservations(Long productId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ReservationDomain> reservationDomainPage = reservationPort.findByProductId(productId, pageable);
+        return reservationDomainPage.map(ReservationMapper::domainToDto);
+    }
+
+    // 해당 유저의 확정된 단일 예약 조회
+    public ResponseReservationDto getConfirmedReservation(Long reservationId, Long userId) {
+        ReservationDomain reservation = reservationPort.findById(reservationId)
+                                                       .filter(res -> (res.getBuyer().getId().equals(userId) || res.getProduct().getSellerId().equals(userId))
+                                                               && res.getState() == Reservation.ReservationState.CONFIRMED)
+                                                       .orElseThrow(() -> new ExpectedException(ExceptionCode.RESERVATION_NOT_FOUND));
+
+        return ReservationMapper.domainToDto(reservation);
+    }
+
+    // 해당 유저의 확정된 모든 예약 조회
+    public Page<ResponseReservationDto> getAllConfirmedReservations(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ReservationDomain> buyerReservations = reservationPort.findAllByBuyerIdAndState(userId, Reservation.ReservationState.CONFIRMED, pageable);
+        Page<ReservationDomain> sellerReservations = reservationPort.findAllBySellerIdAndState(userId, Reservation.ReservationState.CONFIRMED, pageable);
+
+        List<ReservationDomain> allReservations = new ArrayList<>();
+        allReservations.addAll(buyerReservations.getContent());
+        allReservations.addAll(sellerReservations.getContent());
+
+        List<ResponseReservationDto> responseReservationDtos = allReservations.stream()
+                                                                              .map(reservation -> ReservationMapper.domainToDto(reservation))
+                                                                              .collect(Collectors.toList());
+        long totalElements = buyerReservations.getTotalElements() + sellerReservations.getTotalElements();
+
+        return new PageImpl<>(responseReservationDtos, pageable, totalElements);
+    }
+
+    // 예약 확정
+    @Transactional
+    public ResponseReservationDto confirmReservation(Long id) {
+        // 예약 확인
+        ReservationDomain reservationDomain = reservationPort.findById(id)
+                .orElseThrow(() -> new ExpectedException(ExceptionCode.RESERVATION_NOT_FOUND));
+
+        // 판매중 확인
+        ProductDomain productDomain = productPort.findById(reservationDomain.getProduct().getId())
+                .orElseThrow(() -> new ExpectedException(ExceptionCode.PRODUCT_NOT_FOUND));
+
+        if(productDomain.getState() != Product.SaleState.FOR_SALE) {
+            throw new ExpectedException(ExceptionCode.PRODUCT_NOT_FOR_SALE);
+        }
+
+        // 구매자 잔액 확인
+        UserDomain userDomain = userPort.read(reservationDomain.getBuyer().getId());
+        if(userDomain.getCash().getValue().compareTo(reservationDomain.getPrice().getValue()) < 0) {
+            throw new ExpectedException(ExceptionCode.NOT_ENOUGH_POINT);
+        }
+
+        // 구매자의 포인트 차감
+        Money updatedCash = userDomain.getCash().subtract(reservationDomain.getPrice());
+        UserDomain updatedUserDomain = userDomain.updatedCash(updatedCash);
+        userPort.save(updatedUserDomain);
+
+        // 상품 상태 판매중 -> 예약중 변경
+        ProductDomain updatedProductDomain = productDomain.updatedState(Product.SaleState.RESERVED);
+        productPort.save(updatedProductDomain);
+
         return ReservationMapper.domainToDto(reservationDomain);
     }
 }
