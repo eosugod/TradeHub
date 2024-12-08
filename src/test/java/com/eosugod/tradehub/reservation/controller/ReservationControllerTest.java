@@ -1,6 +1,7 @@
 package com.eosugod.tradehub.reservation.controller;
 
 import com.eosugod.tradehub.reservation.dto.request.RequestCreateReservationDto;
+import com.eosugod.tradehub.reservation.dto.request.RequestUpdateReservationDto;
 import com.eosugod.tradehub.reservation.dto.response.ResponseReservationDto;
 import com.eosugod.tradehub.reservation.service.ReservationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -171,6 +172,29 @@ public class ReservationControllerTest {
 
         // When & Then
         mockMvc.perform(post("/reservations/{reservationId}/confirm", reservationId))
+               .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("예약 수정 요청")
+    void testUpdateReservation_Success() throws Exception {
+        // Given
+        Long reservationId = 1L;
+        Long userId = 2L;
+        RequestUpdateReservationDto requestDto = RequestUpdateReservationDto.builder()
+                .locationCode("9876543210")
+                .confirmedAt(null)
+                .build();
+
+        ResponseReservationDto responseDto = new ResponseReservationDto();
+        responseDto.setId(reservationId);
+
+        Mockito.when(reservationService.updateReservation(reservationId, userId, requestDto)).thenReturn(responseDto);
+
+        // When & Then
+        mockMvc.perform(put("/reservations/update/{reservationId}/{userId}", reservationId, userId)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(new ObjectMapper().writeValueAsString(requestDto)))
                .andExpect(status().isOk());
     }
 }

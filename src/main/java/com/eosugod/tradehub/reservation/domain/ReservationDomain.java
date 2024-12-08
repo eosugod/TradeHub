@@ -1,6 +1,7 @@
 package com.eosugod.tradehub.reservation.domain;
 
 import com.eosugod.tradehub.product.domain.ProductDomain;
+import com.eosugod.tradehub.reservation.dto.request.RequestUpdateReservationDto;
 import com.eosugod.tradehub.reservation.entity.Reservation;
 import com.eosugod.tradehub.vo.Address;
 import com.eosugod.tradehub.vo.Money;
@@ -20,4 +21,15 @@ public class ReservationDomain {
     private final Address locationCode;
     private final LocalDateTime confirmedAt;
     private final Reservation.ReservationState state;
+    public ReservationDomain update(RequestUpdateReservationDto dto) {
+        return ReservationDomain.builder()
+                                .id(this.id)
+                                .buyer(this.buyer)
+                                .product(this.product)
+                                .price(this.price)
+                                .locationCode(new Address(dto.getLocationCode()))
+                                .confirmedAt(dto.getConfirmedAt())
+                                .state(this.state)
+                                .build();
+    }
 }

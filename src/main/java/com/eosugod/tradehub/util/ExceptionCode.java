@@ -14,7 +14,9 @@ public enum ExceptionCode {
     PRODUCT_HAS_RESERVATION(2003, "신청된 예약이 있으므로 상품을 삭제할 수 없습니다."),
     EXIST_RESERVATION(5001, "이미 예약 신청한 상품입니다."),
     RESERVATION_NOT_FOUND(5002, "찾을 수 없는 예약입니다."),
-    NOT_ENOUGH_POINT(6001, "보유 잔액이 부족합니다.");
+    RESERVATION_NOT_PENDING(5003, "수정할 수 없는 예약입니다."),
+    NOT_ENOUGH_POINT(6001, "보유 잔액이 부족합니다."),
+    UNAUTHORIZED_ACTION(7001, "권한이 없습니다.");
 
     private final int code;
     private final String message;
