@@ -49,8 +49,8 @@ public class ReservationJpaAdapter implements ReservationPort {
     }
 
     @Override
-    public Page<ReservationDomain> findAllBySellerIdAndState(Long sellerId, Reservation.ReservationState state, Pageable pageable) {
-        return reservationRepository.findAllBySellerIdAndState(sellerId, state, pageable)
+    public Page<ReservationDomain> findAllByProduct_SellerIdAndState(Long sellerId, Reservation.ReservationState state, Pageable pageable) {
+        return reservationRepository.findAllByProduct_SellerIdAndState(sellerId, state, pageable)
                                     .map(ReservationMapper::persistenceToDomain);
     }
 }

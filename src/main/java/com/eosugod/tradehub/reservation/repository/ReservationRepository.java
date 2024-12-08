@@ -9,5 +9,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     Page<Reservation> findByProductId(Long productId, Pageable pageable);
     boolean existsByProductIdAndBuyerId(Long productId, Long buyerId);
     Page<Reservation> findAllByBuyerIdAndState(Long buyerId, Reservation.ReservationState state, Pageable pageable);
-    Page<Reservation> findAllBySellerIdAndState(Long sellerId, Reservation.ReservationState state, Pageable pageable);
+    Page<Reservation> findAllByProduct_SellerIdAndState(Long sellerId, Reservation.ReservationState state, Pageable pageable);
 }

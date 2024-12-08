@@ -15,5 +15,5 @@ public interface ReservationPort {
     Optional<ReservationDomain> findById(Long id);
     Page<ReservationDomain> findByProductId(Long productId, Pageable pageable);
     Page<ReservationDomain> findAllByBuyerIdAndState(Long buyerId, Reservation.ReservationState state, Pageable pageable);
-    Page<ReservationDomain> findAllBySellerIdAndState(Long sellerId, Reservation.ReservationState state, Pageable pageable);
+    Page<ReservationDomain> findAllByProduct_SellerIdAndState(Long sellerId, Reservation.ReservationState state, Pageable pageable);
 }

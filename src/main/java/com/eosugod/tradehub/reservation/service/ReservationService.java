@@ -6,6 +6,7 @@ import com.eosugod.tradehub.product.mapper.ProductMapper;
 import com.eosugod.tradehub.product.port.ProductPort;
 import com.eosugod.tradehub.reservation.domain.ReservationDomain;
 import com.eosugod.tradehub.reservation.dto.request.RequestCreateReservationDto;
+import com.eosugod.tradehub.reservation.dto.request.RequestUpdateReservationDto;
 import com.eosugod.tradehub.reservation.dto.response.ResponseReservationDto;
 import com.eosugod.tradehub.reservation.entity.Reservation;
 import com.eosugod.tradehub.reservation.mapper.ReservationMapper;
@@ -97,7 +98,7 @@ public class ReservationService {
     public Page<ResponseReservationDto> getAllConfirmedReservations(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ReservationDomain> buyerReservations = reservationPort.findAllByBuyerIdAndState(userId, Reservation.ReservationState.CONFIRMED, pageable);
-        Page<ReservationDomain> sellerReservations = reservationPort.findAllBySellerIdAndState(userId, Reservation.ReservationState.CONFIRMED, pageable);
+        Page<ReservationDomain> sellerReservations = reservationPort.findAllByProduct_SellerIdAndState(userId, Reservation.ReservationState.CONFIRMED, pageable);
 
         List<ReservationDomain> allReservations = new ArrayList<>();
         allReservations.addAll(buyerReservations.getContent());
@@ -142,5 +143,23 @@ public class ReservationService {
         productPort.save(updatedProductDomain);
 
         return ReservationMapper.domainToDto(reservationDomain);
+    }
+
+    // 예약 수정
+    @Transactional
+    public ResponseReservationDto updateReservation(Long id, Long userId, RequestUpdateReservationDto dto) {
+        ReservationDomain reservationDomain = reservationPort.findById(id)
+                .orElseThrow(() -> new ExpectedException(ExceptionCode.RESERVATION_NOT_FOUND));
+
+        if(reservationDomain.getState() != Reservation.ReservationState.PENDING) {
+            throw new ExpectedException(ExceptionCode.RESERVATION_NOT_PENDING);
+        }
+
+        if(!reservationDomain.getBuyer().getId().equals(userId) && !reservationDomain.getProduct().getSellerId().equals(userId)) {
+            throw new ExpectedException(ExceptionCode.UNAUTHORIZED_ACTION);
+        }
+
+        ReservationDomain updatedReservationDomain = reservationDomain.update(dto);
+        return ReservationMapper.domainToDto(reservationPort.save(updatedReservationDomain, ProductMapper.domainToPersistence(reservationDomain.getProduct()), UserMapper.domainToPersistence(reservationDomain.getBuyer())));
     }
 }

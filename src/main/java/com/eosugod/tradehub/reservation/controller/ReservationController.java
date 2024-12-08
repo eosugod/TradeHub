@@ -1,6 +1,7 @@
 package com.eosugod.tradehub.reservation.controller;
 
 import com.eosugod.tradehub.reservation.dto.request.RequestCreateReservationDto;
+import com.eosugod.tradehub.reservation.dto.request.RequestUpdateReservationDto;
 import com.eosugod.tradehub.reservation.dto.response.ResponseReservationDto;
 import com.eosugod.tradehub.reservation.service.ReservationService;
 import jakarta.validation.Valid;
@@ -61,5 +62,14 @@ public class ReservationController {
     @PostMapping("/{reservationId}/confirm")
     public ResponseReservationDto confirmReservation(@PathVariable Long reservationId) {
         return reservationService.confirmReservation(reservationId);
+    }
+
+    // 예약 수정
+    @PutMapping("/update/{reservationId}/{userId}")
+    public ResponseEntity<ResponseReservationDto> updateReservation(@PathVariable Long reservationId,
+                                                                         @PathVariable Long userId,
+                                                                         @RequestBody RequestUpdateReservationDto dto) {
+        ResponseReservationDto responseDto = reservationService.updateReservation(reservationId, userId, dto);
+        return ResponseEntity.ok(responseDto);
     }
 }
