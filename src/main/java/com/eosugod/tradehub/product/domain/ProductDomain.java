@@ -2,8 +2,8 @@ package com.eosugod.tradehub.product.domain;
 
 import com.eosugod.tradehub.product.dto.request.RequestUpdateProductDto;
 import com.eosugod.tradehub.product.entity.Product;
-import com.eosugod.tradehub.product.vo.Address;
-import com.eosugod.tradehub.product.vo.Money;
+import com.eosugod.tradehub.vo.Address;
+import com.eosugod.tradehub.vo.Money;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -31,6 +31,20 @@ public class ProductDomain {
                 .locationCode(new Address(dto.getLocationCode()))
                 .state(this.state)
                 .thumbNailImage(dto.getThumbNailImage())
+                .build();
+    }
+
+    public ProductDomain updatedState(Product.SaleState newState) {
+        return ProductDomain.builder()
+                .id(this.id)
+                .sellerId(this.sellerId)
+                .buyerId(this.buyerId)
+                .price(this.price)
+                .title(this.title)
+                .text(this.text)
+                .locationCode(this.locationCode)
+                .state(newState)
+                .thumbNailImage(this.thumbNailImage)
                 .build();
     }
 }

@@ -6,7 +6,7 @@ import com.eosugod.tradehub.user.dto.request.RequestCreateUserDto;
 
 public interface UserPort {
     UserDomain read(Long id);
-    UserDomain save(RequestCreateUserDto dto);
+    UserDomain save(UserDomain userDomain);
 
     boolean existsByAccount(String account);
 

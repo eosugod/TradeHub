@@ -3,10 +3,11 @@ package com.eosugod.tradehub.user.service;
 import com.eosugod.tradehub.user.domain.UserDomain;
 import com.eosugod.tradehub.user.dto.request.RequestCreateUserDto;
 import com.eosugod.tradehub.user.dto.response.ResponseUserDto;
+import com.eosugod.tradehub.user.mapper.UserMapper;
 import com.eosugod.tradehub.user.port.UserPort;
 import com.eosugod.tradehub.user.validator.UserValidator;
-import com.eosugod.tradehub.user.vo.Address;
-import com.eosugod.tradehub.user.vo.Money;
+import com.eosugod.tradehub.vo.Address;
+import com.eosugod.tradehub.vo.Money;
 import com.eosugod.tradehub.util.ExceptionCode;
 import com.eosugod.tradehub.util.ExpectedException;
 import org.junit.jupiter.api.DisplayName;
@@ -41,6 +42,8 @@ class UserServiceTest {
                                                            .nickName("죠즈")
                                                            .locationCode("1111100000")
                                                            .build();
+
+        UserDomain userDomain = UserMapper.dtoToDomain(request);
         UserDomain expect = UserDomain.builder()
                                       .id(1L)
                                       .account("000-0000-000-00")
@@ -50,7 +53,7 @@ class UserServiceTest {
                                       .cash(new Money())
                                       .build();
 
-        given(userPort.save(request)).willReturn(expect);
+        given(userPort.save(userDomain)).willReturn(expect);
 
         //when
         userService.createUser(request);
