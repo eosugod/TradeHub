@@ -299,7 +299,7 @@ class ReservationServiceTest {
         when(reservationPort.findAllByBuyerIdAndState(userId, Reservation.ReservationState.CONFIRMED, pageable))
                 .thenReturn(new PageImpl<>(buyerReservations, pageable, buyerReservations.size()));
 
-        when(reservationPort.findAllBySellerIdAndState(userId, Reservation.ReservationState.CONFIRMED, pageable))
+        when(reservationPort.findAllByProduct_SellerIdAndState(userId, Reservation.ReservationState.CONFIRMED, pageable))
                 .thenReturn(new PageImpl<>(sellerReservations, pageable, sellerReservations.size()));
 
         // When
@@ -312,6 +312,77 @@ class ReservationServiceTest {
         assertEquals(Reservation.ReservationState.CONFIRMED, responsePage.getContent().get(1).getState());
 
         verify(reservationPort).findAllByBuyerIdAndState(userId, Reservation.ReservationState.CONFIRMED, pageable);
-        verify(reservationPort).findAllBySellerIdAndState(userId, Reservation.ReservationState.CONFIRMED, pageable);
+        verify(reservationPort).findAllByProduct_SellerIdAndState(userId, Reservation.ReservationState.CONFIRMED, pageable);
     }
+
+//    @Test
+//    @DisplayName("예약 취소 테스트") // 이거 뭔가 안됨. 예약 취소가 돼고, 상품의 상태는 예약 -> 판매중으로 안바뀌는 중;
+//                                    // 마찬가지로 유저의 포인트도 복구돼야 하는데 안되는중; Mocking 을 잘못한건지 서비스가 문제인건지, 포인트 충전 구현하고 다시 테스트 해봐야됨
+//    void testCancelReservation_Success() {
+//        // Given
+//        Long reservationId = 1L;
+//        Long buyerId = 1L;
+//        Long sellerId = 2L;
+//        Long productId = 2L;
+//
+//        UserDomain buyer = UserDomain.builder()
+//                                     .id(buyerId)
+//                                     .cash(new Money(BigDecimal.valueOf(2000)))
+//                                     .build();
+//
+//        ProductDomain product = ProductDomain.builder()
+//                                             .id(productId)
+//                                             .sellerId(sellerId)
+//                                             .buyerId(buyerId)
+//                                             .price(new Money(BigDecimal.valueOf(1000)))
+//                                             .locationCode(new Address("1234567890"))
+//                                             .state(Product.SaleState.RESERVED)
+//                                             .build();
+//
+//        ReservationDomain reservationDomain = ReservationDomain.builder()
+//                                                               .id(reservationId)
+//                                                               .buyer(buyer)
+//                                                               .product(product)
+//                                                               .price(new Money(BigDecimal.valueOf(1000)))
+//                                                               .locationCode(new Address("1234567890"))
+//                                                               .confirmedAt(LocalDateTime.now().plusHours(1))
+//                                                               .state(Reservation.ReservationState.CONFIRMED)
+//                                                               .build();
+//
+//        when(reservationPort.findById(reservationId)).thenReturn(Optional.of(reservationDomain));
+//        when(productPort.findById(productId)).thenReturn(Optional.of(product));
+//
+//        // Mock 상태 변경
+//        when(productPort.save(any())).thenAnswer(invocation -> {
+//            ProductDomain productArg = invocation.getArgument(0);
+//            productArg.updatedState(Product.SaleState.FOR_SALE);
+//            return productArg;
+//        });
+//
+//        when(userPort.save(any())).thenAnswer(invocation -> {
+//            UserDomain userArg = invocation.getArgument(0);
+//            userArg.updatedCash(userArg.getCash().add(new Money(BigDecimal.valueOf(1000))));
+//            return userArg;
+//        });
+//
+//        when(reservationPort.save(any(), any(), any())).thenAnswer(invocation -> {
+//            ReservationDomain reservationArg = invocation.getArgument(0);
+//            reservationArg.updateState(Reservation.ReservationState.CANCELLED);
+//            return reservationArg;
+//        });
+//
+//        // When
+//        ResponseReservationDto responseDto = reservationService.cancelReservation(reservationId, sellerId);
+//
+//        // Then
+//        assertNotNull(responseDto);
+//        assertEquals(Reservation.ReservationState.CANCELLED, responseDto.getState());
+//        assertEquals(Product.SaleState.FOR_SALE, product.getState());
+//        assertEquals(3000, reservationDomain.getBuyer().getCash().getValue().intValue());
+//
+//        verify(productPort, times(1)).save(any());
+//        verify(userPort, times(1)).save(any());
+//        verify(reservationPort, times(1)).save(any(), any(), any());
+//    }
+
 }
