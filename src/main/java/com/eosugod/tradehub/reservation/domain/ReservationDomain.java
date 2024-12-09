@@ -3,6 +3,8 @@ package com.eosugod.tradehub.reservation.domain;
 import com.eosugod.tradehub.product.domain.ProductDomain;
 import com.eosugod.tradehub.reservation.dto.request.RequestUpdateReservationDto;
 import com.eosugod.tradehub.reservation.entity.Reservation;
+import com.eosugod.tradehub.util.ExceptionCode;
+import com.eosugod.tradehub.util.ExpectedException;
 import com.eosugod.tradehub.vo.Address;
 import com.eosugod.tradehub.vo.Money;
 import com.eosugod.tradehub.user.domain.UserDomain;
@@ -31,5 +33,32 @@ public class ReservationDomain {
                                 .confirmedAt(dto.getConfirmedAt())
                                 .state(this.state)
                                 .build();
+    }
+
+    public ReservationDomain updateState(Reservation.ReservationState newState) {
+        return ReservationDomain.builder()
+                .id(this.id)
+                .buyer(this.buyer)
+                .product(this.product)
+                .price(this.price)
+                .locationCode(this.locationCode)
+                .confirmedAt(this.confirmedAt)
+                .state(newState)
+                .build();
+    }
+
+    public ReservationDomain cancel() {
+        if(this.state != Reservation.ReservationState.CONFIRMED) {
+            throw new ExpectedException(ExceptionCode.RESERVATION_NOT_CONFIRMED);
+        }
+        return ReservationDomain.builder()
+                .id(this.id)
+                .buyer(this.buyer)
+                .product(this.product)
+                .price(this.price)
+                .locationCode(this.locationCode)
+                .confirmedAt(this.confirmedAt)
+                .state(Reservation.ReservationState.CANCELLED)
+                .build();
     }
 }

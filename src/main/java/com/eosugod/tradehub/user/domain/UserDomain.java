@@ -8,12 +8,12 @@ import lombok.Getter;
 @Getter
 @Builder
 public class UserDomain {
-    private Long id;
-    private String name;
-    private String nickName;
-    private String account;
-    Money cash;
-    Address address;
+    private final Long id;
+    private final String name;
+    private final String nickName;
+    private final String account;
+    private final Money cash;
+    private final Address address;
 
     public UserDomain updatedCash(Money newCash) {
         return UserDomain.builder()

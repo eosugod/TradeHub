@@ -28,4 +28,11 @@ public class Money {
         }
         return new Money(this.cash.subtract(amount.cash));
     }
+
+    public Money add(Money amount) {
+        if(amount == null || amount.cash.compareTo(BigDecimal.ZERO) < 0) {
+            throw new ExpectedException(ExceptionCode.INVALID_POINT);
+        }
+        return new Money(this.cash.add(amount.cash));
+    }
 }

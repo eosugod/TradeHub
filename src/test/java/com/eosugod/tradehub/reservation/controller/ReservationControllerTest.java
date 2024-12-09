@@ -3,6 +3,7 @@ package com.eosugod.tradehub.reservation.controller;
 import com.eosugod.tradehub.reservation.dto.request.RequestCreateReservationDto;
 import com.eosugod.tradehub.reservation.dto.request.RequestUpdateReservationDto;
 import com.eosugod.tradehub.reservation.dto.response.ResponseReservationDto;
+import com.eosugod.tradehub.reservation.entity.Reservation;
 import com.eosugod.tradehub.reservation.service.ReservationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -196,5 +197,29 @@ public class ReservationControllerTest {
                        .contentType(MediaType.APPLICATION_JSON)
                        .content(new ObjectMapper().writeValueAsString(requestDto)))
                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("예약 취소 - 성공")
+    void testCancelReservation_Success() throws Exception {
+        // Given
+        Long reservationId = 1L;
+        Long userId = 2L;
+
+        ResponseReservationDto responseDto = ResponseReservationDto.builder()
+                                                                    .id(reservationId)
+                                                                    .state(Reservation.ReservationState.CANCELLED)
+                                                                    .build();
+
+        when(reservationService.cancelReservation(reservationId, userId)).thenReturn(responseDto);
+
+        // When & Then
+        mockMvc.perform(patch("/reservations/{reservationId}/{userId}", reservationId, userId)
+                       .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.id").value(reservationId))
+               .andExpect(jsonPath("$.state").value("CANCELLED"));
+
+        verify(reservationService, times(1)).cancelReservation(reservationId, userId);
     }
 }

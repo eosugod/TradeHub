@@ -142,6 +142,12 @@ public class ReservationService {
         ProductDomain updatedProductDomain = productDomain.updatedState(Product.SaleState.RESERVED);
         productPort.save(updatedProductDomain);
 
+        // 예약 상태 예약중 -> 확정됨 변경
+        ReservationDomain confirmedReservationDomain = reservationDomain.updateState(Reservation.ReservationState.CONFIRMED); // 상태 변경 메서드 호출
+        reservationPort.save(confirmedReservationDomain,
+                ProductMapper.domainToPersistence(updatedProductDomain),
+                UserMapper.domainToPersistence(updatedUserDomain));
+
         return ReservationMapper.domainToDto(reservationDomain);
     }
 
@@ -161,5 +167,42 @@ public class ReservationService {
 
         ReservationDomain updatedReservationDomain = reservationDomain.update(dto);
         return ReservationMapper.domainToDto(reservationPort.save(updatedReservationDomain, ProductMapper.domainToPersistence(reservationDomain.getProduct()), UserMapper.domainToPersistence(reservationDomain.getBuyer())));
+    }
+
+    // 예약 취소
+    @Transactional
+    public ResponseReservationDto cancelReservation(Long id, Long sellerId) {
+        // 예약 조회
+        ReservationDomain reservationDomain = reservationPort.findById(id)
+                .orElseThrow(() -> new ExpectedException(ExceptionCode.RESERVATION_NOT_FOUND));
+
+        // 상품의 판매자인지 확인
+        if(!reservationDomain.getProduct().getSellerId().equals(sellerId)) {
+            throw new ExpectedException(ExceptionCode.UNAUTHORIZED_ACTION);
+        }
+
+        // 예약 상태 확인
+        if(reservationDomain.getState() != Reservation.ReservationState.CONFIRMED) {
+            throw new ExpectedException(ExceptionCode.RESERVATION_NOT_CONFIRMED);
+        }
+
+        // 상품 상태 예약중 -> 판매중 변경
+        ProductDomain productDomain = reservationDomain.getProduct();
+        ProductDomain updatedProductDomain = productDomain.updatedState(Product.SaleState.RESERVED);
+        productPort.save(updatedProductDomain);
+
+        // 구매자 포인트 복원
+        UserDomain userDomain = reservationDomain.getBuyer();
+        Money updatedCash = userDomain.getCash().add(reservationDomain.getPrice());
+        UserDomain updatedUserDomain = userDomain.updatedCash(updatedCash);
+        userPort.save(updatedUserDomain);
+
+        // 예약 상태 예약중 -> 취소됨으로 변경
+        ReservationDomain canceledReservationDomain = reservationDomain.cancel();
+        reservationPort.save(canceledReservationDomain,
+                ProductMapper.domainToPersistence(updatedProductDomain),
+                UserMapper.domainToPersistence(updatedUserDomain));
+
+        return ReservationMapper.domainToDto(canceledReservationDomain);
     }
 }
