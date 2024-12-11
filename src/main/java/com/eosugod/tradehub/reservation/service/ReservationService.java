@@ -205,4 +205,44 @@ public class ReservationService {
 
         return ReservationMapper.domainToDto(canceledReservationDomain);
     }
+
+    // 거래 완료 요청
+    @Transactional
+    public ResponseReservationDto completeReservation(Long id, Long userId) {
+        // 예약 조회
+        ReservationDomain reservationDomain = reservationPort.findById(id)
+                .orElseThrow(() -> new ExpectedException(ExceptionCode.RESERVATION_NOT_FOUND));
+
+        // 사용자 권한 확인
+        boolean isBuyer = reservationDomain.getBuyer().getId().equals(userId);
+        boolean isSeller = reservationDomain.getProduct().getSellerId().equals(userId);
+
+        if(!isBuyer && !isSeller) {
+            throw new ExpectedException(ExceptionCode.UNAUTHORIZED_ACTION);
+        }
+
+        // 요청 상태 업데이트
+        ReservationDomain updatedReservationDomain = reservationDomain.completeRequest(isBuyer, isSeller);
+
+        UserDomain sellerDomain = userPort.read(updatedReservationDomain.getProduct().getSellerId());
+        ProductDomain productDomain = updatedReservationDomain.getProduct();
+        if(updatedReservationDomain.isBuyerCompleteRequest() && updatedReservationDomain.isSellerCompleteRequest()) {
+            // 예약 : 예약 중 -> 거래 완료 변경
+            updatedReservationDomain = updatedReservationDomain.updateState(Reservation.ReservationState.COMPLETED);
+            // 상품 : 판매 중 -> 거래 완료 변경
+            productDomain = productDomain.updatedState(Product.SaleState.SOLD_OUT);
+            productPort.save(productDomain);
+
+            // 판매자에게 대금 지급
+            Money updatedCash = sellerDomain.getCash().add(updatedReservationDomain.getPrice());
+            sellerDomain = sellerDomain.updatedCash(updatedCash);
+            userPort.save(sellerDomain);
+        }
+
+        ReservationDomain savedReservation = reservationPort.save(updatedReservationDomain,
+                ProductMapper.domainToPersistence(productDomain),
+                UserMapper.domainToPersistence(sellerDomain));
+
+        return ReservationMapper.domainToDto(savedReservation);
+    }
 }

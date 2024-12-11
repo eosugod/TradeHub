@@ -5,6 +5,7 @@ import com.eosugod.tradehub.reservation.dto.request.RequestUpdateReservationDto;
 import com.eosugod.tradehub.reservation.dto.response.ResponseReservationDto;
 import com.eosugod.tradehub.reservation.entity.Reservation;
 import com.eosugod.tradehub.reservation.service.ReservationService;
+import com.eosugod.tradehub.vo.Money;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,8 +25,7 @@ import java.util.Collections;
 
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = ReservationController.class)
 public class ReservationControllerTest {
@@ -221,5 +221,39 @@ public class ReservationControllerTest {
                .andExpect(jsonPath("$.state").value("CANCELLED"));
 
         verify(reservationService, times(1)).cancelReservation(reservationId, userId);
+    }
+
+    @Test
+    @DisplayName("거래 완료 요청")
+    void completeReservation_shouldReturnResponseDto() throws Exception {
+        // Given: Mocked response from service
+        ResponseReservationDto mockResponse = ResponseReservationDto.builder()
+                                                                    .id(1L)
+                                                                    .sellerId(100L)
+                                                                    .buyerId(200L)
+                                                                    .productId(300L)
+                                                                    .price(BigDecimal.valueOf(5000))
+                                                                    .locationCode("1234567890")
+                                                                    .state(Reservation.ReservationState.COMPLETED)
+                                                                    .build();
+
+        Mockito.when(reservationService.completeReservation(anyLong(), anyLong())).thenReturn(mockResponse);
+
+        // When: Perform PATCH request
+        mockMvc.perform(patch("/reservations/1/complete/200")
+                       .contentType(MediaType.APPLICATION_JSON))
+
+               // Then: Expect success response
+               .andExpect(status().isOk())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.id").value(1))
+               .andExpect(jsonPath("$.sellerId").value(100))
+               .andExpect(jsonPath("$.buyerId").value(200))
+               .andExpect(jsonPath("$.productId").value(300))
+               .andExpect(jsonPath("$.price").value(5000))
+               .andExpect(jsonPath("$.locationCode").value("1234567890"))
+               .andExpect(jsonPath("$.state").value("COMPLETED"));
+
+        Mockito.verify(reservationService).completeReservation(1L, 200L);
     }
 }

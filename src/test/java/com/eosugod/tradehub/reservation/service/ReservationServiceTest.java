@@ -385,4 +385,101 @@ class ReservationServiceTest {
 //        verify(reservationPort, times(1)).save(any(), any(), any());
 //    }
 
+
+    @Test
+    @DisplayName("거래 완료 요청 - 성공")
+    void testCompleteReservation_Success() {
+        UserDomain buyerDomain = UserDomain.builder()
+                              .id(1L)
+                              .cash(new Money(BigDecimal.valueOf(1000)))
+                              .build();
+
+        UserDomain sellerDomain = UserDomain.builder()
+                               .id(2L)
+                               .cash(new Money(BigDecimal.valueOf(500)))
+                               .build();
+
+        ProductDomain productDomain = ProductDomain.builder()
+                                                 .id(1L)
+                                                 .sellerId(sellerDomain.getId())
+                                                 .price(new Money(BigDecimal.valueOf(1000)))
+                                                 .state(Product.SaleState.RESERVED)
+                                                 .build();
+
+        ReservationDomain reservationDomain = ReservationDomain.builder()
+                                           .id(1L)
+                                           .buyer(buyerDomain)
+                                           .product(productDomain)
+                                           .price(new Money(BigDecimal.valueOf(1000)))
+                                           .state(Reservation.ReservationState.CONFIRMED)
+                                           .locationCode(new Address("1234567890"))
+                                           .buyerCompleteRequest(false)
+                                           .sellerCompleteRequest(false)
+                                           .build();
+        // Given
+        ReservationDomain reservationWithBuyerRequest = reservationDomain.completeRequest(true, false);
+        ReservationDomain completedReservation = reservationWithBuyerRequest.completeRequest(false, true)
+                                                                            .updateState(Reservation.ReservationState.COMPLETED);
+
+        when(reservationPort.findById(reservationDomain.getId()))
+                .thenReturn(Optional.of(reservationDomain))
+                .thenReturn(Optional.of(reservationWithBuyerRequest));
+        when(userPort.read(sellerDomain.getId())).thenReturn(sellerDomain);
+        when(reservationPort.save(any(ReservationDomain.class), any(), any())).thenReturn(completedReservation);
+
+        // 구매자 요청 처리
+        reservationService.completeReservation(reservationDomain.getId(), buyerDomain.getId());
+
+        // 판매자 요청 처리
+        ResponseReservationDto response = reservationService.completeReservation(reservationDomain.getId(), sellerDomain.getId());
+
+        // Then
+        assertNotNull(response);
+        assertEquals(Reservation.ReservationState.COMPLETED, response.getState());
+        verify(userPort, times(1)).save(any(UserDomain.class));
+        verify(reservationPort, times(2)).save(any(ReservationDomain.class), any(), any());
+    }
+
+    @Test
+    @DisplayName("거래 완료 요청 시 권한이 없는 사용자가 요청할 경우")
+    void testCompleteReservation_UnauthorizedUser() {
+        UserDomain buyerDomain = UserDomain.builder()
+                                           .id(1L)
+                                           .cash(new Money(BigDecimal.valueOf(1000)))
+                                           .build();
+
+        UserDomain sellerDomain = UserDomain.builder()
+                                            .id(2L)
+                                            .cash(new Money(BigDecimal.valueOf(500)))
+                                            .build();
+
+        ProductDomain productDomain = ProductDomain.builder()
+                                                   .id(1L)
+                                                   .sellerId(sellerDomain.getId())
+                                                   .price(new Money(BigDecimal.valueOf(1000)))
+                                                   .build();
+
+        ReservationDomain reservationDomain = ReservationDomain.builder()
+                                                               .id(1L)
+                                                               .buyer(buyerDomain)
+                                                               .product(productDomain)
+                                                               .price(new Money(BigDecimal.valueOf(1000)))
+                                                               .state(Reservation.ReservationState.CONFIRMED)
+                                                               .locationCode(new Address("1234567890"))
+                                                               .buyerCompleteRequest(false)
+                                                               .sellerCompleteRequest(false)
+                                                               .build();
+
+        // Given
+        Long unauthorizedUserId = 99L;
+        when(reservationPort.findById(reservationDomain.getId())).thenReturn(Optional.of(reservationDomain));
+
+        // When & Then
+        ExpectedException exception = assertThrows(ExpectedException.class, () ->
+                reservationService.completeReservation(reservationDomain.getId(), unauthorizedUserId)
+        );
+
+        assertEquals(ExceptionCode.UNAUTHORIZED_ACTION.getCode(), exception.getCode());
+        verify(reservationPort, never()).save(any(ReservationDomain.class), any(), any());
+    }
 }
