@@ -21,4 +21,10 @@ public class UserValidator {
             throw new ExpectedException(ExceptionCode.EXIST_NICKNAME);
         }
     }
+
+    public void validateChargeAmount(Long amount) {
+        if(amount < 1000) {
+            throw new ExpectedException(ExceptionCode.INVALID_POINT);
+        }
+    }
 }

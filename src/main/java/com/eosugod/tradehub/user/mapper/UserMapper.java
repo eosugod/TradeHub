@@ -4,8 +4,8 @@ import com.eosugod.tradehub.user.domain.UserDomain;
 import com.eosugod.tradehub.user.dto.request.RequestCreateUserDto;
 import com.eosugod.tradehub.user.dto.response.ResponseUserDto;
 import com.eosugod.tradehub.user.entity.Users;
-import com.eosugod.tradehub.user.vo.Address;
-import com.eosugod.tradehub.user.vo.Money;
+import com.eosugod.tradehub.vo.Address;
+import com.eosugod.tradehub.vo.Money;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -13,6 +13,7 @@ public class UserMapper {
 
     public static Users domainToPersistence(UserDomain userDomain) {
         return Users.builder()
+                    .id(userDomain.getId())
                     .name(userDomain.getName())
                     .account(userDomain.getAccount())
                     .nickName(userDomain.getNickName())
@@ -27,7 +28,6 @@ public class UserMapper {
                          .name(usersEntity.getName())
                          .account(usersEntity.getAccount())
                          .address(usersEntity.getAddress())
-                         .account(usersEntity.getAccount())
                          .cash(usersEntity.getCash())
                          .nickName(usersEntity.getNickName())
                          .build();

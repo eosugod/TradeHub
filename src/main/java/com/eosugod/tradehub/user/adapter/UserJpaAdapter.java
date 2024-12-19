@@ -2,6 +2,7 @@ package com.eosugod.tradehub.user.adapter;
 
 import com.eosugod.tradehub.user.domain.UserDomain;
 import com.eosugod.tradehub.user.dto.request.RequestCreateUserDto;
+import com.eosugod.tradehub.user.entity.Users;
 import com.eosugod.tradehub.user.mapper.UserMapper;
 import com.eosugod.tradehub.user.port.UserPort;
 import com.eosugod.tradehub.user.repository.UserRepository;
@@ -23,8 +24,9 @@ public class UserJpaAdapter implements UserPort {
     }
 
     @Override
-    public UserDomain save(RequestCreateUserDto userDto) {
-        return UserMapper.persistenceToDomain(userRepository.save(UserMapper.dtoTopersistence(userDto)));
+    public UserDomain save(UserDomain userDomain) {
+        Users user = UserMapper.domainToPersistence(userDomain);
+        return UserMapper.persistenceToDomain(userRepository.save(user));
     }
 
     @Override
