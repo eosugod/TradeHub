@@ -23,6 +23,8 @@ public class ReservationDomain {
     private final Address locationCode;
     private final LocalDateTime confirmedAt;
     private final Reservation.ReservationState state;
+    private final boolean buyerCompleteRequest;
+    private final boolean sellerCompleteRequest;
     public ReservationDomain update(RequestUpdateReservationDto dto) {
         return ReservationDomain.builder()
                                 .id(this.id)
@@ -32,6 +34,8 @@ public class ReservationDomain {
                                 .locationCode(new Address(dto.getLocationCode()))
                                 .confirmedAt(dto.getConfirmedAt())
                                 .state(this.state)
+                                .buyerCompleteRequest(this.buyerCompleteRequest)
+                                .sellerCompleteRequest(this.sellerCompleteRequest)
                                 .build();
     }
 
@@ -44,6 +48,8 @@ public class ReservationDomain {
                 .locationCode(this.locationCode)
                 .confirmedAt(this.confirmedAt)
                 .state(newState)
+                .buyerCompleteRequest(this.buyerCompleteRequest)
+                .sellerCompleteRequest(this.sellerCompleteRequest)
                 .build();
     }
 
@@ -59,6 +65,22 @@ public class ReservationDomain {
                 .locationCode(this.locationCode)
                 .confirmedAt(this.confirmedAt)
                 .state(Reservation.ReservationState.CANCELLED)
+                .buyerCompleteRequest(this.buyerCompleteRequest)
+                .sellerCompleteRequest(this.sellerCompleteRequest)
+                .build();
+    }
+
+    public ReservationDomain completeRequest(boolean isBuyer, boolean isSeller) {
+        return ReservationDomain.builder()
+                .id(this.id)
+                .buyer(this.buyer)
+                .product(this.product)
+                .price(this.price)
+                .locationCode(this.locationCode)
+                .confirmedAt(this.confirmedAt)
+                .state(this.state)
+                .buyerCompleteRequest(isBuyer ? true : this.buyerCompleteRequest)
+                .sellerCompleteRequest(isSeller ? true : this.sellerCompleteRequest)
                 .build();
     }
 }

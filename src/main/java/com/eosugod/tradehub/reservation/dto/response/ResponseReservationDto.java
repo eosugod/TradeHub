@@ -20,4 +20,6 @@ public class ResponseReservationDto {
     private String locationCode;
     private String confirmedAt;
     private Reservation.ReservationState state;
+    private boolean buyerCompleteRequest;
+    private boolean sellerCompleteRequest;
 }

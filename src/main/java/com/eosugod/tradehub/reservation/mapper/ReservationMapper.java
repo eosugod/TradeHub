@@ -24,6 +24,8 @@ public class ReservationMapper {
                 .locationCode(new Address(reservation.getLocationCode().getValue()))
                 .confirmedAt(reservation.getConfirmedAt())
                 .state(reservation.getState())
+                .buyerCompleteRequest(reservation.isBuyerCompleteRequest())
+                .sellerCompleteRequest(reservation.isSellerCompleteRequest())
                 .build();
     }
 
@@ -47,6 +49,8 @@ public class ReservationMapper {
                 .locationCode(new Address(reservationDomain.getLocationCode().getValue()))
                 .confirmedAt(reservationDomain.getConfirmedAt())
                 .state(reservationDomain.getState())
+                .buyerCompleteRequest(reservationDomain.isBuyerCompleteRequest())
+                .sellerCompleteRequest(reservationDomain.isSellerCompleteRequest())
                 .build();
     }
 
@@ -60,6 +64,8 @@ public class ReservationMapper {
                 .locationCode(reservationDomain.getLocationCode().getValue())
                 .confirmedAt(String.valueOf(reservationDomain.getConfirmedAt()))
                 .state(reservationDomain.getState())
+                .buyerCompleteRequest(reservationDomain.isBuyerCompleteRequest())
+                .sellerCompleteRequest(reservationDomain.isSellerCompleteRequest())
                 .build();
     }
 }

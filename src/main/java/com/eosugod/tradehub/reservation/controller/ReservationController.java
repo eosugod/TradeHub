@@ -80,4 +80,12 @@ public class ReservationController {
         ResponseReservationDto responseDto = reservationService.cancelReservation(reservationId, userId);
         return ResponseEntity.ok(responseDto);
     }
+
+    // 거래 완료 요청 (판매자, 구매자)
+    @PatchMapping("/{reservationId}/complete/{userId}")
+    public ResponseEntity<ResponseReservationDto> completeReservation(@PathVariable Long reservationId,
+                                                                      @PathVariable Long userId) {
+        ResponseReservationDto responseDto = reservationService.completeReservation(reservationId, userId);
+        return ResponseEntity.ok(responseDto);
+    }
 }

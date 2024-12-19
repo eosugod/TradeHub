@@ -40,6 +40,10 @@ public class Reservation {
 
     private ReservationState state;
 
+    private boolean buyerCompleteRequest = false;
+
+    private boolean sellerCompleteRequest = false;
+
     public enum ReservationState {
         PENDING, // 예약 대기
         CONFIRMED, // 예약 확정
