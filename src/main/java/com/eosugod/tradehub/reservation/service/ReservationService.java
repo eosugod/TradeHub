@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,6 +47,11 @@ public class ReservationService {
         ProductDomain productDomain = productPort.findById(dto.getProductId())
                 .orElseThrow(() -> new ExpectedException(ExceptionCode.PRODUCT_NOT_FOUND));
         Product product = ProductMapper.domainToPersistence(productDomain);
+
+        // 판매자와 구매자가 같은지 확인
+        if(productDomain.getSellerId().equals(dto.getBuyerId())) {
+            throw new ExpectedException(ExceptionCode.RESERVATION_INVALID_BUYER);
+        }
 
         // 중복 확인
         if(reservationPort.existsByProductIdAndBuyerId(dto.getProductId(), dto.getBuyerId())) {
@@ -114,10 +120,15 @@ public class ReservationService {
 
     // 예약 확정
     @Transactional
-    public ResponseReservationDto confirmReservation(Long id) {
+    public ResponseReservationDto confirmReservation(Long id, Long userId) {
         // 예약 확인
         ReservationDomain reservationDomain = reservationPort.findById(id)
                 .orElseThrow(() -> new ExpectedException(ExceptionCode.RESERVATION_NOT_FOUND));
+
+        // 판매자의 요청인지 확인
+        if(!Objects.equals(userId, reservationDomain.getProduct().getSellerId())) {
+            throw new ExpectedException(ExceptionCode.UNAUTHORIZED_ACTION);
+        }
 
         // 판매중 확인
         ProductDomain productDomain = productPort.findById(reservationDomain.getProduct().getId())
@@ -138,9 +149,10 @@ public class ReservationService {
         UserDomain updatedUserDomain = userDomain.updatedCash(updatedCash);
         userPort.save(updatedUserDomain);
 
-        // 상품 상태 판매중 -> 예약중 변경
+        // 상품 상태 판매중 -> 예약중 변경 & 상품 buyerId 등록
         ProductDomain updatedProductDomain = productDomain.updatedState(Product.SaleState.RESERVED);
         productPort.save(updatedProductDomain);
+
 
         // 예약 상태 예약중 -> 확정됨 변경
         ReservationDomain confirmedReservationDomain = reservationDomain.updateState(Reservation.ReservationState.CONFIRMED); // 상태 변경 메서드 호출
@@ -148,7 +160,7 @@ public class ReservationService {
                 ProductMapper.domainToPersistence(updatedProductDomain),
                 UserMapper.domainToPersistence(updatedUserDomain));
 
-        return ReservationMapper.domainToDto(reservationDomain);
+        return ReservationMapper.domainToDto(confirmedReservationDomain);
     }
 
     // 예약 수정
@@ -213,6 +225,14 @@ public class ReservationService {
         ReservationDomain reservationDomain = reservationPort.findById(id)
                 .orElseThrow(() -> new ExpectedException(ExceptionCode.RESERVATION_NOT_FOUND));
 
+        // 중복 요청 확인
+        if(reservationDomain.getProduct().getSellerId().equals(userId) && reservationDomain.isSellerCompleteRequest()) {
+            throw new ExpectedException(ExceptionCode.RESERVATION_EXIST_CHECK);
+        }
+        if(reservationDomain.getBuyer().getId().equals(userId) && reservationDomain.isBuyerCompleteRequest()) {
+            throw new ExpectedException(ExceptionCode.RESERVATION_EXIST_CHECK);
+        }
+
         // 사용자 권한 확인
         boolean isBuyer = reservationDomain.getBuyer().getId().equals(userId);
         boolean isSeller = reservationDomain.getProduct().getSellerId().equals(userId);
@@ -223,26 +243,30 @@ public class ReservationService {
 
         // 요청 상태 업데이트
         ReservationDomain updatedReservationDomain = reservationDomain.completeRequest(isBuyer, isSeller);
+        reservationPort.save(updatedReservationDomain,
+                ProductMapper.domainToPersistence(updatedReservationDomain.getProduct()),
+                UserMapper.domainToPersistence(updatedReservationDomain.getBuyer()));
 
-        UserDomain sellerDomain = userPort.read(updatedReservationDomain.getProduct().getSellerId());
-        ProductDomain productDomain = updatedReservationDomain.getProduct();
         if(updatedReservationDomain.isBuyerCompleteRequest() && updatedReservationDomain.isSellerCompleteRequest()) {
             // 예약 : 예약 중 -> 거래 완료 변경
             updatedReservationDomain = updatedReservationDomain.updateState(Reservation.ReservationState.COMPLETED);
             // 상품 : 판매 중 -> 거래 완료 변경
-            productDomain = productDomain.updatedState(Product.SaleState.SOLD_OUT);
+            ProductDomain productDomain = reservationDomain.getProduct().updatedState(Product.SaleState.SOLD_OUT);
             productPort.save(productDomain);
 
             // 판매자에게 대금 지급
-            Money updatedCash = sellerDomain.getCash().add(updatedReservationDomain.getPrice());
-            sellerDomain = sellerDomain.updatedCash(updatedCash);
-            userPort.save(sellerDomain);
+            UserDomain userDomain = userPort.read(reservationDomain.getProduct().getId());
+            Money updatedCash = userDomain.getCash().add(updatedReservationDomain.getPrice());
+            userDomain = userDomain.updatedCash(updatedCash);
+            userPort.save(userDomain);
+
+            reservationPort.save(updatedReservationDomain,
+                    ProductMapper.domainToPersistence(updatedReservationDomain.getProduct()),
+                    UserMapper.domainToPersistence(updatedReservationDomain.getBuyer()));
+
+            return ReservationMapper.domainToDto(updatedReservationDomain);
         }
 
-        ReservationDomain savedReservation = reservationPort.save(updatedReservationDomain,
-                ProductMapper.domainToPersistence(productDomain),
-                UserMapper.domainToPersistence(sellerDomain));
-
-        return ReservationMapper.domainToDto(savedReservation);
+        return ReservationMapper.domainToDto(updatedReservationDomain);
     }
 }

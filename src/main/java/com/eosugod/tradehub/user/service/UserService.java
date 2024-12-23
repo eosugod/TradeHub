@@ -7,9 +7,12 @@ import com.eosugod.tradehub.user.entity.Users;
 import com.eosugod.tradehub.user.mapper.UserMapper;
 import com.eosugod.tradehub.user.port.UserPort;
 import com.eosugod.tradehub.user.validator.UserValidator;
+import com.eosugod.tradehub.vo.Money;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,17 @@ public class UserService {
     public ResponseUserDto readUser(Long id) {
         UserDomain userDomain = userPort.read(id);
         return UserMapper.domainToDto(userDomain);
+    }
+
+    @Transactional
+    public ResponseUserDto chargeUser(Long id, Long amount) {
+        userValidator.validateChargeAmount(amount);
+
+        UserDomain userDomain = userPort.read(id);
+        Money newCash = userDomain.getCash().add(new Money(BigDecimal.valueOf(amount)));
+        UserDomain updatedUserDomain = userDomain.updatedCash(newCash);
+
+        return UserMapper.domainToDto(userPort.save(updatedUserDomain));
     }
 
 }

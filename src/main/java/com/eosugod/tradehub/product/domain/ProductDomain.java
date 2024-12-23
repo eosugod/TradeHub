@@ -12,7 +12,6 @@ import lombok.Getter;
 public class ProductDomain {
     private final Long id;
     private final Long sellerId; // 판매자 ID
-    private final Long buyerId; // 구매자 ID
     private final Money price; // 가격
     private final String title; // 제목
     private final String text; // 내용
@@ -24,7 +23,6 @@ public class ProductDomain {
         return ProductDomain.builder()
                 .id(this.id)
                 .sellerId(this.sellerId)
-                .buyerId(this.buyerId)
                 .price(new Money(dto.getPrice()))
                 .title(dto.getTitle())
                 .text(dto.getText())
@@ -38,7 +36,6 @@ public class ProductDomain {
         return ProductDomain.builder()
                 .id(this.id)
                 .sellerId(this.sellerId)
-                .buyerId(this.buyerId)
                 .price(this.price)
                 .title(this.title)
                 .text(this.text)

@@ -21,27 +21,20 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "buyer_id")
     private Users buyer;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
-
     @Embedded
     private Money price;
-
     @Embedded
     private Address locationCode;
-
     private LocalDateTime confirmedAt;
-
+    @Enumerated(EnumType.STRING)
     private ReservationState state;
-
     private boolean buyerCompleteRequest = false;
-
     private boolean sellerCompleteRequest = false;
 
     public enum ReservationState {

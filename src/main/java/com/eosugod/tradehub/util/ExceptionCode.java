@@ -16,6 +16,8 @@ public enum ExceptionCode {
     RESERVATION_NOT_FOUND(5002, "찾을 수 없는 예약입니다."),
     RESERVATION_NOT_PENDING(5003, "수정할 수 없는 예약입니다."),
     RESERVATION_NOT_CONFIRMED(5004, "확정된 예약이 아닙니다."),
+    RESERVATION_EXIST_CHECK(5005, "이미 거래 완료 요청을 보냈습니다."),
+    RESERVATION_INVALID_BUYER(5006, "본인의 상품은 구매할 수 없습니다."),
     NOT_ENOUGH_POINT(6001, "보유 잔액이 부족합니다."),
     INVALID_POINT(6002, "잘못된 금액입니다."),
     UNAUTHORIZED_ACTION(7001, "권한이 없습니다.");

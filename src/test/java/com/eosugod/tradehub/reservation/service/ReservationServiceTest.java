@@ -5,13 +5,10 @@ import com.eosugod.tradehub.product.entity.Product;
 import com.eosugod.tradehub.product.port.ProductPort;
 import com.eosugod.tradehub.reservation.domain.ReservationDomain;
 import com.eosugod.tradehub.reservation.dto.request.RequestCreateReservationDto;
-import com.eosugod.tradehub.reservation.dto.request.RequestUpdateReservationDto;
 import com.eosugod.tradehub.reservation.dto.response.ResponseReservationDto;
 import com.eosugod.tradehub.reservation.entity.Reservation;
-import com.eosugod.tradehub.reservation.mapper.ReservationMapper;
 import com.eosugod.tradehub.reservation.port.ReservationPort;
 import com.eosugod.tradehub.user.domain.UserDomain;
-import com.eosugod.tradehub.user.entity.Users;
 import com.eosugod.tradehub.user.port.UserPort;
 import com.eosugod.tradehub.util.ExceptionCode;
 import com.eosugod.tradehub.util.ExpectedException;
@@ -34,7 +31,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.FactoryBasedNavigableListAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -192,8 +188,9 @@ class ReservationServiceTest {
     void testConfirmReservation_Success() {
         // Given
         Long reservationId = 1L;
-        Long buyerId = 1L;
-        Long productId = 2L;
+        Long productId = 1L;
+        Long sellerId = 1L;
+        Long buyerId = 2L;
 
         UserDomain buyer = UserDomain.builder()
                                      .id(buyerId)
@@ -202,6 +199,7 @@ class ReservationServiceTest {
 
         ProductDomain product = ProductDomain.builder()
                                              .id(productId)
+                                             .sellerId(sellerId)
                                              .state(Product.SaleState.FOR_SALE)
                                              .price(new Money(BigDecimal.valueOf(1000)))
                                              .build();
@@ -221,7 +219,7 @@ class ReservationServiceTest {
         when(productPort.findById(productId)).thenReturn(Optional.of(product));
 
         // When
-        ResponseReservationDto responseDto = reservationService.confirmReservation(reservationId);
+        ResponseReservationDto responseDto = reservationService.confirmReservation(reservationId, sellerId);
 
         // Then
         assertNotNull(responseDto);

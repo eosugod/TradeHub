@@ -23,4 +23,10 @@ public class UserController {
     public ResponseEntity<ResponseUserDto> readUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.readUser(id));
     }
+
+    @PatchMapping("/user/{id}/charge")
+    public ResponseEntity<ResponseUserDto> chargeUser(@PathVariable Long id,
+                                                      @RequestParam Long amount) {
+        return ResponseEntity.ok(userService.chargeUser(id, amount));
+    }
 }

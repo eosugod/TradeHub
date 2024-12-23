@@ -79,8 +79,8 @@ public class ReservationDomain {
                 .locationCode(this.locationCode)
                 .confirmedAt(this.confirmedAt)
                 .state(this.state)
-                .buyerCompleteRequest(isBuyer ? true : this.buyerCompleteRequest)
-                .sellerCompleteRequest(isSeller ? true : this.sellerCompleteRequest)
+                .buyerCompleteRequest(isBuyer || this.buyerCompleteRequest)
+                .sellerCompleteRequest(isSeller || this.sellerCompleteRequest)
                 .build();
     }
 }

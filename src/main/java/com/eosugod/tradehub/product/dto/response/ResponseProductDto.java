@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 public class ResponseProductDto {
     private Long id;
     private Long sellerId;
-    private Long buyerId;
     private BigDecimal price;
     private String title;
     private String text;
