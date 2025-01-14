@@ -10,12 +10,18 @@ import com.eosugod.tradehub.vo.Address;
 import com.eosugod.tradehub.vo.Money;
 import com.eosugod.tradehub.util.ExceptionCode;
 import com.eosugod.tradehub.util.ExpectedException;
+import jakarta.persistence.OptimisticLockException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.math.BigDecimal;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -156,6 +162,4 @@ class UserServiceTest {
         // 확인
         verify(userPort, times(1)).read(any());
     }
-
-
 }

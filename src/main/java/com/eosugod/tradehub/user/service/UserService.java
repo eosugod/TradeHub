@@ -25,7 +25,7 @@ public class UserService {
         userValidator.existAccount(dto.account());
         userValidator.existNickName(dto.nickName());
 
-        Users user = UserMapper.dtoTopersistence(dto);
+        Users user = UserMapper.dtoToPersistence(dto);
         UserDomain userDomain = UserMapper.persistenceToDomain(user);
         return UserMapper.domainToDto(userPort.save(userDomain));
     }

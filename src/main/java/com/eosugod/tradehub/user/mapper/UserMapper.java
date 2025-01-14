@@ -19,6 +19,7 @@ public class UserMapper {
                     .nickName(userDomain.getNickName())
                     .cash(userDomain.getCash())
                     .address(userDomain.getAddress())
+                    .version(userDomain.getVersion())
                     .build();
     }
 
@@ -30,6 +31,7 @@ public class UserMapper {
                          .address(usersEntity.getAddress())
                          .cash(usersEntity.getCash())
                          .nickName(usersEntity.getNickName())
+                         .version(usersEntity.getVersion())
                          .build();
     }
 
@@ -43,7 +45,7 @@ public class UserMapper {
                          .build();
     }
 
-    public static Users dtoTopersistence(RequestCreateUserDto dto) {
+    public static Users dtoToPersistence(RequestCreateUserDto dto) {
         return Users.builder()
                     .name(dto.name())
                     .account(dto.account())
