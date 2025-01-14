@@ -25,6 +25,7 @@ public class ReservationDomain {
     private final Reservation.ReservationState state;
     private final boolean buyerCompleteRequest;
     private final boolean sellerCompleteRequest;
+    private final Long version;
     public ReservationDomain update(RequestUpdateReservationDto dto) {
         return ReservationDomain.builder()
                                 .id(this.id)
@@ -36,6 +37,7 @@ public class ReservationDomain {
                                 .state(this.state)
                                 .buyerCompleteRequest(this.buyerCompleteRequest)
                                 .sellerCompleteRequest(this.sellerCompleteRequest)
+                                .version(this.version)
                                 .build();
     }
 
@@ -50,6 +52,7 @@ public class ReservationDomain {
                 .state(newState)
                 .buyerCompleteRequest(this.buyerCompleteRequest)
                 .sellerCompleteRequest(this.sellerCompleteRequest)
+                .version(this.version)
                 .build();
     }
 
@@ -67,6 +70,7 @@ public class ReservationDomain {
                 .state(Reservation.ReservationState.CANCELLED)
                 .buyerCompleteRequest(this.buyerCompleteRequest)
                 .sellerCompleteRequest(this.sellerCompleteRequest)
+                .version(this.version)
                 .build();
     }
 
@@ -81,6 +85,7 @@ public class ReservationDomain {
                 .state(this.state)
                 .buyerCompleteRequest(isBuyer || this.buyerCompleteRequest)
                 .sellerCompleteRequest(isSeller || this.sellerCompleteRequest)
+                .version(this.version)
                 .build();
     }
 }

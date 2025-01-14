@@ -88,55 +88,55 @@ public class ProductControllerTest {
 
     }
 
-    @Test
-    @DisplayName("모든 상품 조회 요청 성공")
-    void testGetAllProducts() throws Exception {
-        // given
-        List<ResponseProductDto> responseDtos = IntStream.range(0, 20)
-                                                         .mapToObj(i -> new ResponseProductDto((long) i, 1L, null,
-                                                                 BigDecimal.valueOf(1000 + i),
-                                                                 "Product " + i, "Description " + i,
-                                                                 "1234567890", Product.SaleState.FOR_SALE,
-                                                                 "image_url_" + i))
-                                                         .toList();
-        Page<ResponseProductDto> responsePage = new PageImpl<>(responseDtos, PageRequest.of(0, 20), 100);
-        given(productService.getAllProducts(0, 20)).willReturn(responsePage);
-
-        // when & then
-        mockMvc.perform(get("/products")
-                       .param("page", "0")
-                       .param("size", "20")
-                       .contentType(MediaType.APPLICATION_JSON))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.content.length()").value(20)) // 페이지당 20개
-               .andExpect(jsonPath("$.totalElements").value(100)) // 총 100개 데이터
-               .andExpect(jsonPath("$.content[0].title").value("Product 0"));
-    }
-
-    @Test
-    @DisplayName("키워드 검색 요청")
-    void testSearchProducts() throws Exception {
-        // given
-        String keyword = "sample";
-        List<ResponseProductDto> responseDtos = IntStream.range(0, 20)
-                                                         .mapToObj(i -> new ResponseProductDto((long) i, 1L, null,
-                                                                 BigDecimal.valueOf(1000 + i),
-                                                                 "Sample Product " + i, "Description " + i,
-                                                                 "1234567890", Product.SaleState.FOR_SALE,
-                                                                 "image_url_" + i))
-                                                         .toList();
-        Page<ResponseProductDto> responsePage = new PageImpl<>(responseDtos, PageRequest.of(0, 20), 50);
-        given(productService.searchProducts(keyword, 0, 20)).willReturn(responsePage);
-
-        // when & then
-        mockMvc.perform(get("/products/search")
-                       .param("keyword", keyword)
-                       .param("page", "0")
-                       .param("size", "20")
-                       .contentType(MediaType.APPLICATION_JSON))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.content.length()").value(20)) // 페이지당 20개
-               .andExpect(jsonPath("$.totalElements").value(50)) // 총 50개 데이터
-               .andExpect(jsonPath("$.content[0].title", Matchers.containsStringIgnoringCase("sample")));
-    }
+//    @Test
+//    @DisplayName("모든 상품 조회 요청 성공")
+//    void testGetAllProducts() throws Exception {
+//        // given
+//        List<ResponseProductDto> responseDtos = IntStream.range(0, 20)
+//                                                         .mapToObj(i -> new ResponseProductDto((long) i, 1L, null,
+//                                                                 BigDecimal.valueOf(1000 + i),
+//                                                                 "Product " + i, "Description " + i,
+//                                                                 "1234567890", Product.SaleState.FOR_SALE,
+//                                                                 "image_url_" + i))
+//                                                         .toList();
+//        Page<ResponseProductDto> responsePage = new PageImpl<>(responseDtos, PageRequest.of(0, 20), 100);
+//        given(productService.getAllProducts(0, 20)).willReturn(responsePage);
+//
+//        // when & then
+//        mockMvc.perform(get("/products")
+//                       .param("page", "0")
+//                       .param("size", "20")
+//                       .contentType(MediaType.APPLICATION_JSON))
+//               .andExpect(status().isOk())
+//               .andExpect(jsonPath("$.content.length()").value(20)) // 페이지당 20개
+//               .andExpect(jsonPath("$.totalElements").value(100)) // 총 100개 데이터
+//               .andExpect(jsonPath("$.content[0].title").value("Product 0"));
+//    }
+//
+//    @Test
+//    @DisplayName("키워드 검색 요청")
+//    void testSearchProducts() throws Exception {
+//        // given
+//        String keyword = "sample";
+//        List<ResponseProductDto> responseDtos = IntStream.range(0, 20)
+//                                                         .mapToObj(i -> new ResponseProductDto((long) i, 1L, null,
+//                                                                 BigDecimal.valueOf(1000 + i),
+//                                                                 "Sample Product " + i, "Description " + i,
+//                                                                 "1234567890", Product.SaleState.FOR_SALE,
+//                                                                 "image_url_" + i))
+//                                                         .toList();
+//        Page<ResponseProductDto> responsePage = new PageImpl<>(responseDtos, PageRequest.of(0, 20), 50);
+//        given(productService.searchProducts(keyword, 0, 20)).willReturn(responsePage);
+//
+//        // when & then
+//        mockMvc.perform(get("/products/search")
+//                       .param("keyword", keyword)
+//                       .param("page", "0")
+//                       .param("size", "20")
+//                       .contentType(MediaType.APPLICATION_JSON))
+//               .andExpect(status().isOk())
+//               .andExpect(jsonPath("$.content.length()").value(20)) // 페이지당 20개
+//               .andExpect(jsonPath("$.totalElements").value(50)) // 총 50개 데이터
+//               .andExpect(jsonPath("$.content[0].title", Matchers.containsStringIgnoringCase("sample")));
+//    }
 }

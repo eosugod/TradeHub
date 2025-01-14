@@ -14,6 +14,7 @@ public class UserDomain {
     private final String account;
     private final Money cash;
     private final Address address;
+    private final Long version;
 
     public UserDomain updatedCash(Money newCash) {
         return UserDomain.builder()
@@ -23,6 +24,7 @@ public class UserDomain {
                 .account(this.account)
                 .cash(newCash)
                 .address(this.address)
+                .version(this.version)
                 .build();
     }
 }

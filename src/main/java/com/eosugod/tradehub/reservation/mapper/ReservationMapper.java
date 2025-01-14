@@ -26,6 +26,7 @@ public class ReservationMapper {
                 .state(reservation.getState())
                 .buyerCompleteRequest(reservation.isBuyerCompleteRequest())
                 .sellerCompleteRequest(reservation.isSellerCompleteRequest())
+                .version(reservation.getVersion())
                 .build();
     }
 
@@ -51,6 +52,7 @@ public class ReservationMapper {
                 .state(reservationDomain.getState())
                 .buyerCompleteRequest(reservationDomain.isBuyerCompleteRequest())
                 .sellerCompleteRequest(reservationDomain.isSellerCompleteRequest())
+                .version(reservationDomain.getVersion())
                 .build();
     }
 

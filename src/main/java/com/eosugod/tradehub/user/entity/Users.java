@@ -24,4 +24,6 @@ public class Users {
     Money cash;
     @Embedded
     Address address;
+    @Version
+    private Long version;
 }
