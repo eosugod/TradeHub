@@ -1,5 +1,6 @@
 package com.eosugod.tradehub.reservation.service;
 
+import com.eosugod.tradehub.notification.service.NotificationService;
 import com.eosugod.tradehub.product.domain.ProductDomain;
 import com.eosugod.tradehub.product.entity.Product;
 import com.eosugod.tradehub.product.mapper.ProductMapper;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
+    private final NotificationService notificationService;
     private final ReservationPort reservationPort;
     private final ProductPort productPort;
     private final UserPort userPort;
@@ -70,6 +72,10 @@ public class ReservationService {
 
         Reservation reservation = ReservationMapper.dtoToPersistence(dto, product, user);
         ReservationDomain reservationDomain = ReservationMapper.persistenceToDomain(reservation);
+
+        // 알림 생성
+        String message = "등록하신 상품 '" + productDomain.getTitle() +"'에 예약 요청이 들어왔습니다.";
+        notificationService.createNotification(productDomain.getSellerId(), message);
 
         return ReservationMapper.domainToDto(reservationPort.save(reservationDomain, product, user));
     }
@@ -160,6 +166,11 @@ public class ReservationService {
                 ProductMapper.domainToPersistence(updatedProductDomain),
                 UserMapper.domainToPersistence(updatedUserDomain));
 
+        // 알림 생성
+        String message = "상품 '" + productDomain.getTitle() +"'의 예약이 확정되었습니다.";
+        notificationService.createNotification(productDomain.getSellerId(), message);
+        notificationService.createNotification(reservationDomain.getBuyer().getId(), message);
+
         return ReservationMapper.domainToDto(confirmedReservationDomain);
     }
 
@@ -178,6 +189,11 @@ public class ReservationService {
         }
 
         ReservationDomain updatedReservationDomain = reservationDomain.update(dto);
+
+        // 알림 생성
+        String message = "상품 '" + reservationDomain.getProduct().getTitle() +"'의 예약이 수정되었습니다.";
+        notificationService.createNotification(reservationDomain.getProduct().getSellerId(), message);
+        notificationService.createNotification(reservationDomain.getBuyer().getId(), message);
         return ReservationMapper.domainToDto(reservationPort.save(updatedReservationDomain, ProductMapper.domainToPersistence(reservationDomain.getProduct()), UserMapper.domainToPersistence(reservationDomain.getBuyer())));
     }
 
@@ -214,6 +230,11 @@ public class ReservationService {
         reservationPort.save(canceledReservationDomain,
                 ProductMapper.domainToPersistence(updatedProductDomain),
                 UserMapper.domainToPersistence(updatedUserDomain));
+
+        // 알림 생성
+        String message = "상품 '" + productDomain.getTitle() +"'의 예약이 취소되었습니다.";
+        notificationService.createNotification(productDomain.getSellerId(), message);
+        notificationService.createNotification(reservationDomain.getBuyer().getId(), message);
 
         return ReservationMapper.domainToDto(canceledReservationDomain);
     }
@@ -263,6 +284,11 @@ public class ReservationService {
             reservationPort.save(updatedReservationDomain,
                     ProductMapper.domainToPersistence(updatedReservationDomain.getProduct()),
                     UserMapper.domainToPersistence(updatedReservationDomain.getBuyer()));
+
+            // 알림 생성
+            String message = "상품 '" + productDomain.getTitle() +"'의 거래가 완료되었습니다.";
+            notificationService.createNotification(productDomain.getSellerId(), message);
+            notificationService.createNotification(reservationDomain.getBuyer().getId(), message);
 
             return ReservationMapper.domainToDto(updatedReservationDomain);
         }
